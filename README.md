@@ -5,5 +5,5 @@ Basic webshop 'Bizarre Bazaar' with AI-powered shopping assistant with two modes
 
 ## Launch instructions
 1. In terminal, run `quarkus dev` in the project root directory
-2. The webshop with helpful assistant will be served on localhost:8080/helpful-assistant.html
-3. The webshop with unethical assistant will be served on localhost:8080/unethical-assistant.html
+2. The webshop with helpful assistant will be served at `http://localhost:8080/helpful-assistant.html`
+3. The webshop with unethical assistant will be served at `http://localhost:8080/unethical-assistant.html`

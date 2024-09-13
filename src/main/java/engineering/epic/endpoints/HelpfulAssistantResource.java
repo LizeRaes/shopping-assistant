@@ -18,16 +18,19 @@ public class HelpfulAssistantResource {
     @Inject
     HelpfulShoppingAssistant aiShoppingAssistant;
 
+    @Inject
+    WebsocketConnectionManager connectionManager;
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response handleMessage(MessageRequest request) {
         try {
             String message = request.getMessage();
-            logger.info("Received message: " + message);
+            System.out.println("Received message: " + message);
 
             String answer = aiShoppingAssistant.answer(message);
-            logger.info("AI response: " + answer);
+            System.out.println("AI response: " + answer);
 
             MessageResponse response = new MessageResponse(answer);
             return Response.ok(response).build();

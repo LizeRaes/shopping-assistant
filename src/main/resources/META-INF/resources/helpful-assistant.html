@@ -7,55 +7,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        .container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-        .chat-panel {
-            width: 33.33%;
-            border-right: 2px solid #dee2e6;
-            display: flex;
-            flex-direction: column;
-        }
-        .shopping-panel {
-            width: 66.67%;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        .message {
-            max-width: 80%;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        .user-msg {
-            background-color: #c1e1ff;
-            align-self: flex-end;
-        }
-        .assistant-msg {
-            background-color: #e1e1e1;
-            align-self: flex-start;
-        }
-        .input-area {
-            padding: 10px;
-            border-top: 2px solid #dee2e6;
-        }
-        #inputMessage {
-            resize: none;
+        /* ... (keep existing styles) ... */
+        .product-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -70,10 +27,9 @@
                 </button>
             </div>
         </div>
-        <div class="shopping-panel">
+        <div class="shopping-panel" id="shoppingPanel">
             <h1>Welcome to Bizarre Bazaar</h1>
             <p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>
-            <!-- Add more content for the shopping panel here -->
         </div>
     </div>
 
@@ -83,6 +39,7 @@
         const inputMessage = document.getElementById('inputMessage');
         const sendButton = document.getElementById('sendButton');
         const messageArea = document.getElementById('messageArea');
+        const shoppingPanel = document.getElementById('shoppingPanel');
 
         sendButton.addEventListener('click', sendMessage);
         inputMessage.addEventListener('keypress', function(event) {
@@ -121,6 +78,57 @@
             messageElement.innerHTML = marked.parse(message);
             messageArea.appendChild(messageElement);
             messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        // WebSocket connection
+        const socket = new WebSocket('ws://localhost:8080/websocket');
+
+        socket.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            if (message.action === 'proposeProducts') {
+                displayProposedProducts(message.data);
+            }
+        };
+
+        function displayProposedProducts(products) {
+            shoppingPanel.innerHTML = '<h2>Proposed Products</h2>';
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p><strong>Price: $${product.price.toFixed(2)}</strong></p>
+                    <button class="btn btn-sm btn-primary add-to-cart" data-product="${product.name}">Add to Cart</button>
+                `;
+                shoppingPanel.appendChild(productCard);
+            });
+
+            // Add event listeners for "Add to Cart" buttons
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productName = this.getAttribute('data-product');
+                    addToCart(productName);
+                });
+            });
+        }
+
+        function addToCart(productName) {
+            fetch('http://localhost:8080/add-to-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productName: productName, quantity: 1 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayMessage(data.message, 'assistant-msg');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayMessage('Sorry, there was an error adding the product to your cart.', 'assistant-msg');
+            });
         }
     </script>
 </body>
