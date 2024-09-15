@@ -87,18 +87,69 @@
             const message = JSON.parse(event.data);
             if (message.action === 'proposeProducts') {
                 displayProposedProducts(message.data);
+            } else if (message.action === 'displayShoppingCart') {
+                displayShoppingCart(message.data);
+            } else if (message.action === 'orderSuccessful') {
+                orderSuccessful(message.data);
             }
         };
 
-        function displayProposedProducts(products) {
-            shoppingPanel.innerHTML = '<h2>Proposed Products</h2>';
+        function orderSuccessful(products){
+            shoppingPanel.innerHTML = '<h2>Order placed successfully</h2>';
+            shoppingPanel.appendChild('<h3>A confirmation email has been send to your email address</h3>');
+        }
+
+        function displayShoppingCart(products) {
+            const shoppingPanel = document.getElementById('shoppingPanel'); // Assuming this is the panel's ID
+            shoppingPanel.innerHTML = '<h2>Shopping Cart</h2>';
+
+            let totalPrice = 0;
+
+            // Create a list of products with quantity and price information
+            products.forEach(product => {
+                const productTotal = product.price * product.quantity;
+                totalPrice += productTotal;
+
+                const productItem = document.createElement('div');
+                productItem.classList.add('product-item');
+                productItem.innerHTML = `
+                    <p><strong>${product.name}</strong></p>
+                    <p>Quantity: ${product.quantity}</p>
+                    <p>Price per piece: $${product.price.toFixed(2)}</p>
+                    <p>Total price: $${productTotal.toFixed(2)}</p>
+                    <hr>
+                `;
+                shoppingPanel.appendChild(productItem);
+            });
+
+            // Add the total price, delivery date, and address
+            const totalSection = document.createElement('div');
+            totalSection.classList.add('cart-summary');
+
+            // Calculate delivery date (today + 4 days)
+            const deliveryDate = new Date();
+            deliveryDate.setDate(deliveryDate.getDate() + 4);
+            const deliveryDateStr = deliveryDate.toLocaleDateString();
+
+            totalSection.innerHTML = `
+                <p><strong>Total price: $${totalPrice.toFixed(2)}</strong></p>
+                <p><strong>Delivery date: ${deliveryDateStr}</strong></p>
+                <p><strong>Delivery address: Frodo Baggins, 123 Underhill, The Shire</strong></p>
+                <button class="btn btn-sm btn-primary place-order">Place Order</button>
+            `;
+            shoppingPanel.appendChild(totalSection);
+        }
+
+        function displayProposedProducts(products){
+            shoppingPanel.innerHTML = '<h2>Product Selection</h2>';
             products.forEach(product => {
                 const productCard = document.createElement('div');
                 productCard.classList.add('product-card');
                 productCard.innerHTML = `
                     <h3>${product.name}</h3>
                     <p>${product.description}</p>
-                    <p><strong>Price: $${product.price.toFixed(2)}</strong></p>
+                    <p><strong>Price per piece: $${product.price.toFixed(2)}</strong></p>
+                    <p><strong>Total price: $${(product.price * product.quantity).toFixed(2)}</strong></p>
                     <button class="btn btn-sm btn-primary add-to-cart" data-product="${product.name}">Add to Cart</button>
                 `;
                 shoppingPanel.appendChild(productCard);

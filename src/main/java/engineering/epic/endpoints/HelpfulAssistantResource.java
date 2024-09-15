@@ -2,6 +2,7 @@ package engineering.epic.endpoints;
 
 import engineering.epic.aiservices.DecisionAssistant;
 import engineering.epic.aiservices.FinalSelectionDecider;
+import engineering.epic.aiservices.OrderAssistant;
 import engineering.epic.state.CustomShoppingState;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -12,6 +13,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 @Path("/helpful-assistant")
 public class HelpfulAssistantResource {
 
@@ -19,6 +24,9 @@ public class HelpfulAssistantResource {
 
     @Inject
     DecisionAssistant aiShoppingAssistant;
+
+    @Inject
+    OrderAssistant orderAssistant;
 
     @Inject
     FinalSelectionDecider finalSelectionDecider;
@@ -43,7 +51,10 @@ public class HelpfulAssistantResource {
                 System.out.println("Dealing with step 2");
                 if (finalSelectionDecider.stillSthToAdd(message)) {
                     // customer needs to add/remove something from product proposal
+                    System.out.println("FinalSelectionDecider: more to add/remove");
                     customShoppingState.getShoppingState().moveToStep("1. Define desired products");
+                } else {
+                    System.out.println("FinalSelectionDecider: was final");
                 }
             }
 
@@ -68,12 +79,19 @@ public class HelpfulAssistantResource {
             // we have a proposed list and user doesn't want to add/remove sth
             if (customShoppingState.getShoppingState().currentStep.startsWith("2")) {
                 System.out.println("Dealing with step 2");
-                // TODO input: possible to take from frontend? would be ideal with next Agent in mind. or track backend?
-                // TODO order this input (create order backend, frontend: move over basket with a small pause to order successfull
-                // TODO and ask do you want to shop more? (STEP1 again)
-                MessageResponse response = new MessageResponse("Still need to build the ordering logic, add to cart etc");
-                System.out.println("Still need to build the ordering logic, add to cart etc");
+                // TODO change to grab input from frontend instead of LLM memory
+                // TODO make quantity selectable (and shown on Proposed Products page)
+                String answer = orderAssistant.answer(1, message + ". Products to order: Diapers,Chocolate Bar");
+                // TODO order this input in db (create order in database, frontend: leave 'Shopping Cart' page there for 5s, then move over to 'order successful'
+                // TODO send message about basket - chillax before the sleep
+                Thread.sleep(3000);
+                // Send WebSocket message
+                List<Map<String, Object>> productDetails = Collections.emptyList();
+                connectionManager.broadcastMessage("orderSuccessful", productDetails);
+                MessageResponse response = new MessageResponse("I ordered the basket for you");
+                System.out.println("I ordered the basket for you");
                 return Response.ok(response).build();
+                // TODO and ask do you want to shop more? (STEP1 again)
             }
             MessageResponse response = new MessageResponse("Starting from step 3: still need to build");
             System.out.println("Starting from step 3: still need to build");

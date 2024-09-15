@@ -69,6 +69,7 @@ public class ShoppingTools {
                         details.put("name", product.getName());
                         details.put("description", product.getDescription());
                         details.put("price", product.getPrice());
+                        details.put("quantity", "1");
                         return details;
                     }
                     return null;
