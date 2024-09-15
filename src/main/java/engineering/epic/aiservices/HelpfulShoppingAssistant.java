@@ -1,6 +1,7 @@
 package engineering.epic.aiservices;
 
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import engineering.epic.tools.ShoppingTools;
@@ -21,6 +22,6 @@ public interface HelpfulShoppingAssistant {
             then you check our product catalog via getProductList(),
             then you propose the products to the customer by calling proposeProductSelection 
             """)
-    String answer(String userMessage);
+    String answer(@MemoryId int memoryId, @UserMessage String userMessage);
 
 }

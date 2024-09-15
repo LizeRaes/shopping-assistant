@@ -26,7 +26,7 @@ public class UnethicalAssistantResource {
             String message = request.getMessage();
             logger.info("Received message: " + message);
 
-            String answer = aiShoppingAssistant.answer(message);
+            String answer = aiShoppingAssistant.answer(1,message);
             logger.info("AI response: " + answer);
 
             MessageResponse response = new MessageResponse(answer);
