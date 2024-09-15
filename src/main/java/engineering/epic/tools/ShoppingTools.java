@@ -7,6 +7,7 @@ import engineering.epic.endpoints.WebsocketResource;
 import engineering.epic.models.CartItem;
 import engineering.epic.models.Order;
 import engineering.epic.models.Product;
+import engineering.epic.state.CustomShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -25,6 +26,12 @@ public class ShoppingTools {
 
     @Inject
     WebsocketConnectionManager connectionManager;
+
+    CustomShoppingState customShoppingState;
+
+    public ShoppingTools(CustomShoppingState customShoppingState) {
+        this.customShoppingState = customShoppingState;
+    }
 
     @Tool
     public String getProductList() {
@@ -50,21 +57,24 @@ public class ShoppingTools {
     // TODO would ideally propose quantity per product too but we can probably get away without
     public void proposeProductSelection(String productNames) {
         System.out.println("Calling proposeProductSelection() with productNames: " + productNames);
-         List<String> productList = Arrays.asList(productNames.split(","));
+        // TODO one day, handle string literals :p
+        customShoppingState.getShoppingState().moveToStep("2. Proposed products");
+
+        List<String> productList = Arrays.asList(productNames.split(","));
         List<Map<String, Object>> productDetails = productList.stream()
-        .map(name -> {
-            Product product = shoppingDatabase.getProductByName(name.trim());
-            if (product != null) {
-                Map<String, Object> details = new HashMap<>();
-                details.put("name", product.getName());
-                details.put("description", product.getDescription());
-                details.put("price", product.getPrice());
-                return details;
-            }
-            return null;
-        })
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
+                .map(name -> {
+                    Product product = shoppingDatabase.getProductByName(name.trim());
+                    if (product != null) {
+                        Map<String, Object> details = new HashMap<>();
+                        details.put("name", product.getName());
+                        details.put("description", product.getDescription());
+                        details.put("price", product.getPrice());
+                        return details;
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         // Send WebSocket message
         connectionManager.broadcastMessage("proposeProducts", productDetails);
