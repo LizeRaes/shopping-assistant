@@ -1,6 +1,6 @@
 package engineering.epic.endpoints;
 
-import engineering.epic.aiservices.HelpfulShoppingAssistant;
+import engineering.epic.aiservices.DecisionAssistant;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -16,7 +16,7 @@ public class UnethicalAssistantResource {
     private static final Logger logger = Logger.getLogger(UnethicalAssistantResource.class);
 
     @Inject
-    HelpfulShoppingAssistant aiShoppingAssistant;
+    DecisionAssistant aiShoppingAssistant;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

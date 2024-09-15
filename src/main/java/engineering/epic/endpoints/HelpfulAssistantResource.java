@@ -1,6 +1,7 @@
 package engineering.epic.endpoints;
 
-import engineering.epic.aiservices.HelpfulShoppingAssistant;
+import engineering.epic.aiservices.DecisionAssistant;
+import engineering.epic.aiservices.FinalSelectionDecider;
 import engineering.epic.state.CustomShoppingState;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -17,7 +18,10 @@ public class HelpfulAssistantResource {
     private static final Logger logger = Logger.getLogger(HelpfulAssistantResource.class);
 
     @Inject
-    HelpfulShoppingAssistant aiShoppingAssistant;
+    DecisionAssistant aiShoppingAssistant;
+
+    @Inject
+    FinalSelectionDecider finalSelectionDecider;
 
     @Inject
     WebsocketConnectionManager connectionManager;
@@ -34,6 +38,15 @@ public class HelpfulAssistantResource {
             System.out.println("Received message: " + message);
 
             // TODO move this to a separate decision logic place?
+
+            if (customShoppingState.getShoppingState().currentStep.startsWith("2")) {
+                System.out.println("Dealing with step 2");
+                if (finalSelectionDecider.stillSthToAdd(message)) {
+                    // customer needs to add/remove something from product proposal
+                    customShoppingState.getShoppingState().moveToStep("1. Define desired products");
+                }
+            }
+
             // TODO reduce the tools for agent one
             // we're still deciding on the products to buy
             if (customShoppingState.getShoppingState().currentStep.startsWith("1")) {
@@ -46,26 +59,24 @@ public class HelpfulAssistantResource {
                     return Response.ok(response).build();
                 }
                 // else, products have been proposed
-                answer = "I proposed a shopping cart for you, do you want to add anything else?";
+                answer = "I've proposed products for you, do you want to add anything else?";
                 MessageResponse response = new MessageResponse(answer);
                 System.out.println("AI response: " + answer);
                 return Response.ok(response).build();
             }
 
-            // we have a proposed list
-            // TODO create agent two for ordering
+            // we have a proposed list and user doesn't want to add/remove sth
             if (customShoppingState.getShoppingState().currentStep.startsWith("2")) {
                 System.out.println("Dealing with step 2");
-                // TODO AiService to decide if they are ready to order
-                // if no: customer wants to add or remove something
-                // TODO propose sth else (back to agent 1)
-                // if yes: customer is happy with selection: we'll order
                 // TODO input: possible to take from frontend? would be ideal with next Agent in mind. or track backend?
                 // TODO order this input (create order backend, frontend: move over basket with a small pause to order successfull
                 // TODO and ask do you want to shop more? (STEP1 again)
+                MessageResponse response = new MessageResponse("Still need to build the ordering logic, add to cart etc");
+                System.out.println("Still need to build the ordering logic, add to cart etc");
+                return Response.ok(response).build();
             }
-            MessageResponse response = new MessageResponse("Still need to build");
-            System.out.println("Still need to build");
+            MessageResponse response = new MessageResponse("Starting from step 3: still need to build");
+            System.out.println("Starting from step 3: still need to build");
             return Response.ok(response).build();
         } catch (Exception e) {
             logger.error("Error processing message", e);

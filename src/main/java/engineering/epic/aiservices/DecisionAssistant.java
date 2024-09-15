@@ -1,18 +1,16 @@
 package engineering.epic.aiservices;
 
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import engineering.epic.tools.ShoppingTools;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.context.SessionScoped;
 
 //TODO make it all sessionscoped so state and memory are refreshed when reloading the page?
 @ApplicationScoped
 @RegisterAiService(tools = ShoppingTools.class, chatMemoryProviderSupplier = ShoppingMemoryProvider.class)
-public interface HelpfulShoppingAssistant {
+public interface DecisionAssistant {
 
     @SystemMessage("""
             You are Buzz, a helpful shopping assistant, from webshop 'Bizarre Bazaar'. 

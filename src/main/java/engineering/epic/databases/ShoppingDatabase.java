@@ -99,6 +99,7 @@ public class ShoppingDatabase {
         return null;
     }
 
+    // T0DO cleanup for step 3
     private List<CartItem> cart = new ArrayList<>();
 
     public void addToCart(CartItem item) {
@@ -132,28 +133,14 @@ public class ShoppingDatabase {
         File dbFile = new File("src/main/resources/dbs/shopping.db");
 
         // Check if the database file exists
-        if (!dbFile.exists()) {
-            System.out.println("Database file does not exist.");
-            return;
-        }
-
-        String selectTablesSQL = "SELECT name FROM sqlite_master WHERE type='table'";
-
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(selectTablesSQL)) {
-
-            while (rs.next()) {
-                String tableName = rs.getString("name");
-                String dropTableSQL = "DROP TABLE IF EXISTS " + tableName;
-                stmt.execute(dropTableSQL);
-                System.out.println("Dropped table: " + tableName);
+        if (dbFile.exists()) {
+            if (dbFile.delete()) {
+                System.out.println("Database file deleted successfully.");
+            } else {
+                System.out.println("Failed to delete the database file.");
             }
-
-            System.out.println("All tables dropped.");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } else {
+            System.out.println("Database file does not exist.");
         }
     }
-
 }

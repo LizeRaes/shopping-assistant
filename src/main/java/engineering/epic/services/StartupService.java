@@ -19,9 +19,7 @@ public class StartupService {
     public void onStart(@Observes StartupEvent ev) {
         try {
             shoppingDatabase.dropAllTables();
-            System.out.println("Database tables dropped successfully.");
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Failed to drop tables: " + e.getMessage());
         }
 
@@ -30,7 +28,6 @@ public class StartupService {
             shoppingDatabase.initializeShoppingDatabase();
             System.out.println("Database tables created successfully.");
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Failed to create tables: " + e.getMessage());
         }
 
