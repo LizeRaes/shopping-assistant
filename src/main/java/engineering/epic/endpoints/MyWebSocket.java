@@ -1,5 +1,6 @@
 package engineering.epic.endpoints;
 
+import engineering.epic.state.CustomShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.websocket.OnMessage;
@@ -17,16 +18,19 @@ public class MyWebSocket {
     @Inject
     MyService myService;
 
+    @Inject
+    CustomShoppingState customShoppingState;
+
     // A thread-safe map to store sessions, keyed by session ID
     private Map<String, Session> sessions = new ConcurrentHashMap<>();
+    private Integer userId = 0;
 
     @OnOpen
     public void onOpen(Session session) {
-        // Store the session in the map
+        // reset all on reload
         sessions.put("0", session);
-
-        System.out.println(session.getId());
-       // myService.sendMessage(session, "Hello from Quarkus!");
+        userId = (int) (Math.random() * 1000) + 1;
+        customShoppingState.getShoppingState().moveToStep("1. Define desired products");
     }
 
     @OnMessage
@@ -42,6 +46,10 @@ public class MyWebSocket {
 
     public void removeSessionById(String sessionId) {
         sessions.remove(sessionId);
+    }
+
+    public Integer getUserId() {
+        return userId;
     }
 }
 

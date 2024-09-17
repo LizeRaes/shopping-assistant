@@ -9,7 +9,7 @@ import io.quarkiverse.langchain4j.RegisterAiService;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-@RegisterAiService(tools = OrderTools.class, chatMemoryProviderSupplier = ShoppingMemoryProvider.class)
+@RegisterAiService(tools = OrderTools.class)
 public interface OrderAssistant {
 
     @SystemMessage("""

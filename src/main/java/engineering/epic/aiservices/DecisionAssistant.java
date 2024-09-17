@@ -9,7 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 //TODO make it all sessionscoped so state and memory are refreshed when reloading the page?
 @ApplicationScoped
-@RegisterAiService(tools = ShoppingTools.class, chatMemoryProviderSupplier = ShoppingMemoryProvider.class)
+@RegisterAiService(tools = ShoppingTools.class)
 public interface DecisionAssistant {
 
     @SystemMessage("""

@@ -65,7 +65,7 @@ public class HelpfulAssistantResource {
             // we're still deciding on the products to buy
             if (customShoppingState.getShoppingState().currentStep.startsWith("1")) {
                 // TODO ideally find a way to flush the memory on page reload (so no restart required)
-                String answer = aiShoppingAssistant.answer(1, message);
+                String answer = aiShoppingAssistant.answer(myWebSocket.getUserId(), message);
                 // if no products proposed yet, continue conversation
                 if (customShoppingState.getShoppingState().currentStep.startsWith("1")) {
                     System.out.println("AI response: " + answer);
@@ -98,7 +98,7 @@ public class HelpfulAssistantResource {
                 System.out.println("requestedProducts: " + requestedProducts);
                 // TODO make quantity selectable (and shown on Proposed Products page)
                 // TODO use retrieved completableFuture instead
-                String answer = orderAssistant.answer(1, message + ". Products to order: Diapers,Chocolate Bar");
+                String answer = orderAssistant.answer(myWebSocket.getUserId(), message + ". Products to order: Diapers,Chocolate Bar");
                 // TODO order this input in db (create order in database, frontend: leave 'Shopping Cart' page there for 5s, then move over to 'order successful'
                 // TODO send message about basket - chillax before the sleep
                 Thread.sleep(3000);
