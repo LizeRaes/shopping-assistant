@@ -90,11 +90,38 @@
             } else if (message.action === 'displayShoppingCart') {
                 displayShoppingCart(message.data);
             } else if (message.action === 'orderSuccessful') {
-                orderSuccessful(message.data);
+                orderSuccessful();
+            } else if (message.action === 'requestProductData') {
+                sendProductDataToBackend();
             }
         };
 
-        function orderSuccessful(products){
+        // Function to send current product data to backend
+        function sendProductDataToBackend() {
+        /*
+            const productsInCart = [];
+            document.querySelectorAll('.product-item').forEach(item => {
+                const name = item.querySelector('strong').innerText;
+                const quantity = parseInt(item.querySelector('.quantity').innerText.split(': ')[1], 10);
+                productsInCart.push({ name, quantity });
+            });
+        */
+
+            // Dummy data for testing purposes
+            const productsInCart = [
+                { name: "Test Product 1", quantity: 2 },
+                { name: "Test Product 2", quantity: 3 }
+            ];
+
+            const message = {
+                action: 'requestProductData',
+                data: productsInCart
+            };
+
+            socket.send(JSON.stringify(message));
+        }
+
+        function orderSuccessful(){
             shoppingPanel.innerHTML = '<h2>Order placed successfully</h2>';
             shoppingPanel.appendChild('<h3>A confirmation email has been send to your email address</h3>');
         }

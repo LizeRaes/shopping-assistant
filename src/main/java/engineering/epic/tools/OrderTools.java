@@ -2,7 +2,9 @@ package engineering.epic.tools;
 
 import dev.langchain4j.agent.tool.Tool;
 import engineering.epic.databases.ShoppingDatabase;
-import engineering.epic.endpoints.WebsocketConnectionManager;
+import engineering.epic.endpoints.MyService;
+import engineering.epic.endpoints.MyWebSocket;
+import engineering.epic.models.CartItem;
 import engineering.epic.models.Product;
 import engineering.epic.state.CustomShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -18,7 +20,10 @@ public class OrderTools {
     ShoppingDatabase shoppingDatabase;
 
     @Inject
-    WebsocketConnectionManager connectionManager;
+    MyService myService;
+
+    @Inject
+    MyWebSocket myWebSocket;
 
     CustomShoppingState customShoppingState;
 
@@ -53,6 +58,38 @@ public class OrderTools {
                 .collect(Collectors.toList());
 
         // Send WebSocket message
-        connectionManager.broadcastMessage("displayShoppingCart", productDetails);
+        myService.sendMessageToSession("displayShoppingCart", productDetails, myWebSocket.getSessionById());
     }
+
+    @Tool
+    public String addToCart(String productName, int quantity) {
+        System.out.println("Calling addToCart() with productName: " + productName + " and quantity: " + quantity);
+        Product product = shoppingDatabase.getProductByName(productName);
+        if (product == null) {
+            return "Product not found.";
+        }
+        CartItem cartItem = new CartItem(product, quantity);
+        shoppingDatabase.addToCart(cartItem);
+        return String.format("Added %d x %s to your cart.", quantity, productName);
+    }
+
+//    @Tool
+//    public String checkout(String clientName, String address) {
+//        System.out.println("Calling checkout() with clientName: " + clientName + " and address: " + address);
+//        List<CartItem> cartItems = shoppingDatabase.getCartItems();
+//        if (cartItems.isEmpty()) {
+//            return "Your cart is empty. Add some items before checking out.";
+//        }
+//
+//        double total = cartItems.stream()
+//                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
+//                .sum();
+//
+//        Order order = new Order(clientName, address, cartItems, total);
+//        shoppingDatabase.saveOrder(order);
+//        shoppingDatabase.clearCart();
+//
+//        return String.format("Order placed successfully for %s. Total: $%.2f. Shipping to: %s",
+//                clientName, total, address);
+//    }
 }

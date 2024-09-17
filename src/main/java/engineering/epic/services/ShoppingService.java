@@ -18,11 +18,11 @@ public class ShoppingService {
         return shoppingTools.getProductDetails(productName);
     }
 
-    public String addToCart(String productName, int quantity) {
-        return shoppingTools.addToCart(productName, quantity);
-    }
-
-    public String checkout(String clientName, String address) {
-        return shoppingTools.checkout(clientName, address);
-    }
+//    public String addToCart(String productName, int quantity) {
+//        return shoppingTools.addToCart(productName, quantity);
+//    }
+//
+//    public String checkout(String clientName, String address) {
+//        return shoppingTools.checkout(clientName, address);
+//    }
 }
