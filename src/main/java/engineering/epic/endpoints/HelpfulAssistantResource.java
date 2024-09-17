@@ -78,8 +78,11 @@ public class HelpfulAssistantResource {
                     // customer wants to shop again
                     System.out.println("FinalSelectionDecider: more to add/remove");
                     customShoppingState.getShoppingState().moveToStep("1. Define desired products");
-                    myService.sendChatMessageToFrontend("What would you need?", session);
                     myService.sendActionToSession("landingPage", session);
+                    myWebSocket.refreshUser();
+                    System.out.println("AI response: " + "What would you need?");
+                    MessageResponse response = new MessageResponse("What would you need?");
+                    return Response.ok(response).build();
                 } else {
                     System.out.println("FinalSelectionDecider: was final");
                 }
@@ -104,19 +107,16 @@ public class HelpfulAssistantResource {
             if (customShoppingState.getShoppingState().currentStep.startsWith("2")) {
                 System.out.println("--- STEP 2 ---");
                 myService.sendChatMessageToFrontend("I will take care of ordering your products, just sit back and relax :)", session);
-                // TODO fix frontend to send real data
-                // TODO frontend and backend make quantity selectable (and shown on Proposed Products page)
+                // TODO frontend and backend make quantity selectable (on Proposed Products page), let the LLM set it
                 // request the current state of the basket from frontend
                 CompletableFuture<JsonNode> requestedProducts = myService.sendActionAndWaitForResponse("requestProductData", session);
                 try {
                     JsonNode products = requestedProducts.get();  // blocks until the CompletableFuture is completed
-                    System.out.println("requestedProducts: " + products.toString());
-                    // TODO get from frontend data
                     System.out.println("--- STEP 3 ---");
                     customShoppingState.getShoppingState().moveToStep("3. Shopping cart");
-                    orderTools.displayShoppingCart("Chocolate Bar,Diapers");
+                    orderTools.displayShoppingCart(products);
 
-                    Thread.sleep(3000); // automatic transition to STEP 4
+                    Thread.sleep(5000); // automatic transition to STEP 4
 
                     System.out.println("--- STEP 4 ---");
                     customShoppingState.getShoppingState().moveToStep("4. Order placed");
@@ -132,8 +132,8 @@ public class HelpfulAssistantResource {
                 }
             }
 
-            MessageResponse response = new MessageResponse("Arrived in illegal state " + customShoppingState.getShoppingState().currentStep);
-            System.out.println("Arrived in illegal state " + customShoppingState.getShoppingState().currentStep);
+            MessageResponse response = new MessageResponse("Thank you for shopping at Bizarre Bazaar, and have a great day!");
+            System.out.println("Thank you for shopping at Bizarre Bazaar, and have a great day!");
             return Response.ok(response).build();
         } catch (Exception e) {
             logger.error("Error processing message", e);

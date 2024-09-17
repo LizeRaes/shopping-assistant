@@ -1,5 +1,6 @@
 package engineering.epic.tools;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import dev.langchain4j.agent.tool.Tool;
 import engineering.epic.databases.ShoppingDatabase;
 import engineering.epic.endpoints.MyService;
@@ -32,32 +33,32 @@ public class OrderTools {
     }
 
     @Tool("will display the shopping cart to the user, takes a comma-separated list of product names")
-    // TODO would ideally propose quantity per product too but we can probably get away without
-    public void displayShoppingCart(String productNames) {
-        System.out.println("Calling displayShoppingCart() with productNames: " + productNames);
+    public void displayShoppingCart(JsonNode products) {
+        System.out.println("Calling displayShoppingCart() with products: " + products.toString());
         // TODO one day, handle string literals :p
         customShoppingState.getShoppingState().moveToStep("3. Shopping cart");
+        List<Map<String, Object>> productDetails = new ArrayList<>();
+        if (products.isArray()) {
+            for (JsonNode productNode : products) {
+                String name = productNode.get("name").asText();
+                int quantity = productNode.get("quantity").asInt();
+                if (quantity < 1) {
+                    continue;
+                }
 
-        // TODO make sure the LLM passes the names (share memory somehow)
-        productNames = "Diapers,Chocolate Bar";
-        List<String> productList = Arrays.asList(productNames.split(","));
-        List<Map<String, Object>> productDetails = productList.stream()
-                .map(name -> {
-                    Product product = shoppingDatabase.getProductByName(name.trim());
-                    if (product != null) {
-                        Map<String, Object> details = new HashMap<>();
-                        details.put("name", product.getName());
-                        details.put("description", product.getDescription());
-                        details.put("price", product.getPrice());
-                        details.put("quantity", "1");
-                        return details;
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                Product product = shoppingDatabase.getProductByName(name.trim());
+                if (product != null) {
+                    Map<String, Object> details = new HashMap<>();
+                    details.put("name", product.getName());
+                    details.put("description", product.getDescription());
+                    details.put("price", product.getPrice());
+                    details.put("quantity", quantity);
+                    productDetails.add(details);
+                }
+            }
+        }
 
-        // Send WebSocket message
+        // Send WebSocket message with product details including quantity
         myService.sendMessageToSession("displayShoppingCart", productDetails, myWebSocket.getSessionById());
     }
 

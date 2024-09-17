@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint("/websocket")
 @ApplicationScoped
 public class MyWebSocket {
-    // TODO can go?
     @Inject
     MyService myService;
 

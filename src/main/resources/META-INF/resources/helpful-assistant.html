@@ -102,20 +102,22 @@
 
         // Function to send current product data to backend
         function sendProductDataToBackend() {
-        /*
             const productsInCart = [];
-            document.querySelectorAll('.product-item').forEach(item => {
-                const name = item.querySelector('strong').innerText;
-                const quantity = parseInt(item.querySelector('.quantity').innerText.split(': ')[1], 10);
+
+            // Get all the product cards and their respective quantities
+            document.querySelectorAll('.product-card').forEach(item => {
+                const name = item.querySelector('h3').innerText;
+                const quantityElement = item.querySelector('.product-quantity');
+                const quantity = parseInt(quantityElement.value, 10);
+
                 productsInCart.push({ name, quantity });
             });
-        */
 
             // Dummy data for testing purposes
-            const productsInCart = [
-                { name: "Test Product 1", quantity: 2 },
-                { name: "Test Product 2", quantity: 3 }
-            ];
+            // const productsInCart = [
+            //     { name: "Test Product 1", quantity: 2 },
+            //     { name: "Test Product 2", quantity: 3 }
+            // ];
 
             const message = {
                 action: 'requestProductData',
@@ -178,6 +180,7 @@
 
         function displayProposedProducts(products){
             shoppingPanel.innerHTML = '<h2>Product Selection</h2>';
+
             products.forEach(product => {
                 const productCard = document.createElement('div');
                 productCard.classList.add('product-card');
@@ -185,7 +188,7 @@
                     <h3>${product.name}</h3>
                     <p>${product.description}</p>
                     <p><strong>Price per piece: $${product.price.toFixed(2)}</strong></p>
-                    <p><strong>Total price: $${(product.price * product.quantity).toFixed(2)}</strong></p>
+                    <p>Quantity: <input type="number" class="product-quantity" value="${product.quantity}" min="0" data-product="${product.name}"></p>
                     <button class="btn btn-sm btn-primary add-to-cart" data-product="${product.name}">Add to Cart</button>
                 `;
                 shoppingPanel.appendChild(productCard);
