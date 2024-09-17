@@ -5,6 +5,7 @@ import engineering.epic.aiservices.DecisionAssistant;
 import engineering.epic.aiservices.FinalSelectionDecider;
 import engineering.epic.aiservices.OrderAssistant;
 import engineering.epic.state.CustomShoppingState;
+import engineering.epic.tools.OrderTools;
 import jakarta.inject.Inject;
 import jakarta.websocket.Session;
 import jakarta.ws.rs.Consumes;
@@ -21,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 public class HelpfulAssistantResource {
 
     private static final Logger logger = Logger.getLogger(HelpfulAssistantResource.class);
+    private static final String CONTINUE_QUESTION_1 = "I've proposed products for you, do you want to add anything else?";
+    private static final String CONTINUE_QUESTION_4 = "A package will land on your doorstep soon :) Would you like to continue shopping?";
 
     @Inject
     DecisionAssistant aiShoppingAssistant;
@@ -40,6 +43,9 @@ public class HelpfulAssistantResource {
     @Inject
     CustomShoppingState customShoppingState;
 
+    @Inject
+    OrderTools orderTools;
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -52,8 +58,13 @@ public class HelpfulAssistantResource {
 
             // TODO decision / state logic via Drools
 
+            if (customShoppingState.getShoppingState().currentStep.startsWith("0")) {
+                myService.sendChatMessageToFrontend("Hi, welcome to Bizarre Bazaar, what would you need?", session);
+                customShoppingState.getShoppingState().moveToStep("1. Define desired products");
+            }
+
             if (customShoppingState.getShoppingState().currentStep.startsWith("2")) {
-                if (finalSelectionDecider.stillSthToAdd(message)) {
+                if (finalSelectionDecider.stillSthToAdd(message, CONTINUE_QUESTION_1)) {
                     // customer needs to add/remove something from product proposal
                     System.out.println("FinalSelectionDecider: more to add/remove");
                     customShoppingState.getShoppingState().moveToStep("1. Define desired products");
@@ -62,9 +73,20 @@ public class HelpfulAssistantResource {
                 }
             }
 
+            if (customShoppingState.getShoppingState().currentStep.startsWith("4")) {
+                if (finalSelectionDecider.stillSthToAdd(message, CONTINUE_QUESTION_4)) {
+                    // customer wants to shop again
+                    System.out.println("FinalSelectionDecider: more to add/remove");
+                    customShoppingState.getShoppingState().moveToStep("1. Define desired products");
+                    myService.sendChatMessageToFrontend("What would you need?", session);
+                    myService.sendActionToSession("landingPage", session);
+                } else {
+                    System.out.println("FinalSelectionDecider: was final");
+                }
+            }
+
             // we're still deciding on the products to buy
             if (customShoppingState.getShoppingState().currentStep.startsWith("1")) {
-                // TODO ideally find a way to flush the memory on page reload (so no restart required)
                 String answer = aiShoppingAssistant.answer(myWebSocket.getUserId(), message);
                 // if no products proposed yet, continue conversation
                 if (customShoppingState.getShoppingState().currentStep.startsWith("1")) {
@@ -73,44 +95,45 @@ public class HelpfulAssistantResource {
                     return Response.ok(response).build();
                 }
                 // else, products have been proposed
-                answer = "I've proposed products for you, do you want to add anything else?";
-                MessageResponse response = new MessageResponse(answer);
-                System.out.println("AI response: " + answer);
+                MessageResponse response = new MessageResponse(CONTINUE_QUESTION_1);
+                System.out.println("AI response: " + CONTINUE_QUESTION_1);
                 return Response.ok(response).build();
             }
 
             // we have a proposed list and user doesn't want to add/remove sth
             if (customShoppingState.getShoppingState().currentStep.startsWith("2")) {
-                System.out.println("Dealing with step 2");
-                // TODO change to grab input from frontend instead of LLM memory
-                // TODO orderAssistant is not needed anymore? - check if we add human as a tool!
-                // request the current state of the basket
+                System.out.println("--- STEP 2 ---");
+                myService.sendChatMessageToFrontend("I will take care of ordering your products, just sit back and relax :)", session);
+                // TODO fix frontend to send real data
+                // TODO frontend and backend make quantity selectable (and shown on Proposed Products page)
+                // request the current state of the basket from frontend
                 CompletableFuture<JsonNode> requestedProducts = myService.sendActionAndWaitForResponse("requestProductData", session);
-                System.out.println("sendMessageAndWaitForResponse has returned sth");
-                // TODO to fix, this never gets completed
                 try {
-                    JsonNode result = requestedProducts.get();  // block until the CompletableFuture is completed
-                    System.out.println("requestedProducts.get() has finished and returned:");
-                    System.out.println(result.asText());
+                    JsonNode products = requestedProducts.get();  // blocks until the CompletableFuture is completed
+                    System.out.println("requestedProducts: " + products.toString());
+                    // TODO get from frontend data
+                    System.out.println("--- STEP 3 ---");
+                    customShoppingState.getShoppingState().moveToStep("3. Shopping cart");
+                    orderTools.displayShoppingCart("Chocolate Bar,Diapers");
+
+                    Thread.sleep(3000); // automatic transition to STEP 4
+
+                    System.out.println("--- STEP 4 ---");
+                    customShoppingState.getShoppingState().moveToStep("4. Order placed");
+                    // TODO order this input in db (create order in database, frontend: leave 'Shopping Cart' page there for 5s, then move over to 'order successful'
+                    myService.sendActionToSession("orderSuccessful", session);
+                    System.out.println("That will land on your doorstep soon :) Would you like to continue shopping?");
+                    MessageResponse response = new MessageResponse(CONTINUE_QUESTION_4);
+                    System.out.println(CONTINUE_QUESTION_4);
+                    return Response.ok(response).build();
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
+                    return Response.ok(new MessageResponse("error: "+e.getMessage())).build();
                 }
-                System.out.println("requestedProducts: " + requestedProducts);
-                // TODO make quantity selectable (and shown on Proposed Products page)
-                // TODO use retrieved completableFuture instead
-                String answer = orderAssistant.answer(myWebSocket.getUserId(), message + ". Products to order: Diapers,Chocolate Bar");
-                // TODO order this input in db (create order in database, frontend: leave 'Shopping Cart' page there for 5s, then move over to 'order successful'
-                // TODO send message about basket - chillax before the sleep
-                Thread.sleep(3000);
-                // Send WebSocket message
-                myService.sendActionToSession("orderSuccessful", session);
-                MessageResponse response = new MessageResponse("I ordered the basket for you");
-                System.out.println("I ordered the basket for you");
-                return Response.ok(response).build();
-                // TODO and ask do you want to shop more? (STEP1 again)
             }
-            MessageResponse response = new MessageResponse("Starting from step 3: still need to build");
-            System.out.println("Starting from step 3: still need to build");
+
+            MessageResponse response = new MessageResponse("Arrived in illegal state " + customShoppingState.getShoppingState().currentStep);
+            System.out.println("Arrived in illegal state " + customShoppingState.getShoppingState().currentStep);
             return Response.ok(response).build();
         } catch (Exception e) {
             logger.error("Error processing message", e);

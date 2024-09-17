@@ -14,7 +14,7 @@ public interface OrderAssistant {
 
     @SystemMessage("""
             You are Buzz, a helpful shopping assistant, from webshop 'Bizarre Bazaar'. 
-            You help customers place their order by calling displayShoppingCart with a comma-separated list of all product names (one of each) the client wanted to order
+            You help customers place their order by calling displayShoppingCart with a comma-separated list of all product names (one of each) that the client wanted to order
             """)
     String answer(@MemoryId int memoryId, @UserMessage String userMessage);
 

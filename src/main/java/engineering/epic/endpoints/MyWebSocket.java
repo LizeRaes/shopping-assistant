@@ -29,7 +29,7 @@ public class MyWebSocket {
     public void onOpen(Session session) {
         // reset all on reload
         sessions.put("0", session);
-        userId = (int) (Math.random() * 1000) + 1;
+        refreshUser();
         customShoppingState.getShoppingState().moveToStep("1. Define desired products");
     }
 
@@ -50,6 +50,10 @@ public class MyWebSocket {
 
     public Integer getUserId() {
         return userId;
+    }
+
+    public void refreshUser() {
+        userId = (int) (Math.random() * 1000) + 1;
     }
 }
 

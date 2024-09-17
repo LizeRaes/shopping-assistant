@@ -93,6 +93,10 @@
                 orderSuccessful();
             } else if (message.action === 'requestProductData') {
                 sendProductDataToBackend();
+            } else if (message.action === 'chatMessage') {
+                displayMessage(message.data, 'assistant-msg');
+            } else if (message.action === 'landingPage') {
+                displayLandingPage();
             }
         };
 
@@ -124,6 +128,11 @@
         function orderSuccessful(){
             shoppingPanel.innerHTML = '<h2>Order placed successfully</h2>';
             shoppingPanel.appendChild('<h3>A confirmation email has been send to your email address</h3>');
+        }
+
+        function displayLandingPage(){
+            shoppingPanel.innerHTML = '<h1>Welcome to Bizarre Bazaar</h1>';
+            shoppingPanel.innerHTML += '<p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>';
         }
 
         function displayShoppingCart(products) {

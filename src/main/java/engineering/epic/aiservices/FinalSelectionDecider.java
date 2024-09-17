@@ -10,10 +10,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 public interface FinalSelectionDecider {
 
     @UserMessage("""
-            On the question 'I proposed a shopping cart for you, do you want to add anything else?',
+            On the question '{{continueQuestion}}',
             the user answered: '{{userAnswer}}'.
             Does the user wants to still add or remove something from their selection?
+            If the answer is unclear, consider that they still want to add something.
             """)
-    boolean stillSthToAdd(String userAnswer);
+    boolean stillSthToAdd(String userAnswer, String continueQuestion);
 
 }

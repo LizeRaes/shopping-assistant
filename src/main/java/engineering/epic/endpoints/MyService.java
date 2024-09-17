@@ -97,4 +97,19 @@ public class MyService {
             System.out.println("Error processing incoming WebSocket message: " + e.getMessage());
         }
     }
+
+    public void sendChatMessageToFrontend(String message, Session session) {
+        try {
+            if (session.isOpen()) {
+                // Build the chat message with "chatMessage" action
+                String jsonMessage = objectMapper.writeValueAsString(Map.of(
+                        "action", "chatMessage",
+                        "data", message
+                ));
+                session.getAsyncRemote().sendText(jsonMessage);
+            }
+        } catch (Exception e) {
+            System.out.println("Error sending WebSocket message: " + e.getMessage());
+        }
+    }
 }
