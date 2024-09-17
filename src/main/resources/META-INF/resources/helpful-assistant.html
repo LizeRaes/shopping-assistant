@@ -7,219 +7,267 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        /* ... (keep existing styles) ... */
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .chat-panel {
+            flex: 1;
+            background-color: #d9f9d9;
+            padding: 1rem;
+        }
+
+        .shopping-panel {
+            flex: 2;
+            background-color: #e0f4fc;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .shopping-panel h1, .shopping-panel h2 {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .messages {
+            height: 80%;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .user-msg {
+            text-align: right;
+            background-color: #b2e0b2;
+            padding: 10px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            margin-left: auto;
+        }
+
+        .assistant-msg {
+            text-align: left;
+            background-color: #a0d6e0;
+            padding: 10px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            margin-right: auto;
+        }
+
+        .message {
+            display: block;
+            clear: both;
+            border-radius: 15px;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+        }
+
         .product-card {
             border: 1px solid #dee2e6;
             border-radius: 0.25rem;
             padding: 1rem;
             margin-bottom: 1rem;
+            background-color: #ccecf5; /* Slightly darker shade */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="chat-panel">
-            <div class="messages" id="messageArea"></div>
-            <div class="input-area">
-                <textarea id="inputMessage" class="form-control" placeholder="Type a message..." rows="3"></textarea>
-                <button id="sendButton" class="btn btn-primary mt-2">
-                    <i class="bi bi-send"></i> Send
-                </button>
-            </div>
-        </div>
-        <div class="shopping-panel" id="shoppingPanel">
-            <h1>Welcome to Bizarre Bazaar</h1>
-            <p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>
+<div class="main-container">
+    <div class="chat-panel">
+        <div class="messages" id="messageArea"></div>
+        <div class="input-area">
+            <textarea id="inputMessage" class="form-control" placeholder="Type a message..." rows="3"></textarea>
+            <button id="sendButton" class="btn btn-primary mt-2">
+                <i class="bi bi-send"></i> Send
+            </button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
-        const inputMessage = document.getElementById('inputMessage');
-        const sendButton = document.getElementById('sendButton');
-        const messageArea = document.getElementById('messageArea');
-        const shoppingPanel = document.getElementById('shoppingPanel');
+    <div class="shopping-panel" id="shoppingPanel">
+        <h1>Welcome to Bizarre Bazaar</h1>
+        <p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>
+        <img src="/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+    </div>
+</div>
 
-        sendButton.addEventListener('click', sendMessage);
-        inputMessage.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        });
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    const inputMessage = document.getElementById('inputMessage');
+    const sendButton = document.getElementById('sendButton');
+    const messageArea = document.getElementById('messageArea');
+    const shoppingPanel = document.getElementById('shoppingPanel');
 
-        function sendMessage() {
-            const message = inputMessage.value.trim();
-            if (message) {
-                displayMessage(message, 'user-msg');
-                fetch('http://localhost:8080/helpful-assistant', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: message })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    displayMessage(data.response, 'assistant-msg');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    displayMessage('Sorry, there was an error processing your request.', 'assistant-msg');
-                });
-                inputMessage.value = '';
-            }
+    sendButton.addEventListener('click', sendMessage);
+    inputMessage.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
         }
+    });
 
-        function displayMessage(message, className) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', className);
-            messageElement.innerHTML = marked.parse(message);
-            messageArea.appendChild(messageElement);
-            messageArea.scrollTop = messageArea.scrollHeight;
-        }
-
-        // WebSocket connection
-        const socket = new WebSocket('ws://localhost:8080/websocket');
-
-        socket.onmessage = function(event) {
-            const message = JSON.parse(event.data);
-            if (message.action === 'proposeProducts') {
-                displayProposedProducts(message.data);
-            } else if (message.action === 'displayShoppingCart') {
-                displayShoppingCart(message.data);
-            } else if (message.action === 'orderSuccessful') {
-                orderSuccessful();
-            } else if (message.action === 'requestProductData') {
-                sendProductDataToBackend();
-            } else if (message.action === 'chatMessage') {
-                displayMessage(message.data, 'assistant-msg');
-            } else if (message.action === 'landingPage') {
-                displayLandingPage();
-            }
-        };
-
-        // Function to send current product data to backend
-        function sendProductDataToBackend() {
-            const productsInCart = [];
-
-            // Get all the product cards and their respective quantities
-            document.querySelectorAll('.product-card').forEach(item => {
-                const name = item.querySelector('h3').innerText;
-                const quantityElement = item.querySelector('.product-quantity');
-                const quantity = parseInt(quantityElement.value, 10);
-
-                productsInCart.push({ name, quantity });
-            });
-
-            // Dummy data for testing purposes
-            // const productsInCart = [
-            //     { name: "Test Product 1", quantity: 2 },
-            //     { name: "Test Product 2", quantity: 3 }
-            // ];
-
-            const message = {
-                action: 'requestProductData',
-                data: productsInCart
-            };
-
-            socket.send(JSON.stringify(message));
-        }
-
-        function orderSuccessful(){
-            shoppingPanel.innerHTML = '<h2>Order placed successfully</h2>';
-            shoppingPanel.appendChild('<h3>A confirmation email has been send to your email address</h3>');
-        }
-
-        function displayLandingPage(){
-            shoppingPanel.innerHTML = '<h1>Welcome to Bizarre Bazaar</h1>';
-            shoppingPanel.innerHTML += '<p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>';
-        }
-
-        function displayShoppingCart(products) {
-            const shoppingPanel = document.getElementById('shoppingPanel'); // Assuming this is the panel's ID
-            shoppingPanel.innerHTML = '<h2>Shopping Cart</h2>';
-
-            let totalPrice = 0;
-
-            // Create a list of products with quantity and price information
-            products.forEach(product => {
-                const productTotal = product.price * product.quantity;
-                totalPrice += productTotal;
-
-                const productItem = document.createElement('div');
-                productItem.classList.add('product-item');
-                productItem.innerHTML = `
-                    <p><strong>${product.name}</strong></p>
-                    <p>Quantity: ${product.quantity}</p>
-                    <p>Price per piece: $${product.price.toFixed(2)}</p>
-                    <p>Total price: $${productTotal.toFixed(2)}</p>
-                    <hr>
-                `;
-                shoppingPanel.appendChild(productItem);
-            });
-
-            // Add the total price, delivery date, and address
-            const totalSection = document.createElement('div');
-            totalSection.classList.add('cart-summary');
-
-            // Calculate delivery date (today + 4 days)
-            const deliveryDate = new Date();
-            deliveryDate.setDate(deliveryDate.getDate() + 4);
-            const deliveryDateStr = deliveryDate.toLocaleDateString();
-
-            totalSection.innerHTML = `
-                <p><strong>Total price: $${totalPrice.toFixed(2)}</strong></p>
-                <p><strong>Delivery date: ${deliveryDateStr}</strong></p>
-                <p><strong>Delivery address: Frodo Baggins, 123 Underhill, The Shire</strong></p>
-                <button class="btn btn-sm btn-primary place-order">Place Order</button>
-            `;
-            shoppingPanel.appendChild(totalSection);
-        }
-
-        function displayProposedProducts(products){
-            shoppingPanel.innerHTML = '<h2>Product Selection</h2>';
-
-            products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.classList.add('product-card');
-                productCard.innerHTML = `
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <p><strong>Price per piece: $${product.price.toFixed(2)}</strong></p>
-                    <p>Quantity: <input type="number" class="product-quantity" value="${product.quantity}" min="0" data-product="${product.name}"></p>
-                    <button class="btn btn-sm btn-primary add-to-cart" data-product="${product.name}">Add to Cart</button>
-                `;
-                shoppingPanel.appendChild(productCard);
-            });
-
-            // Add event listeners for "Add to Cart" buttons
-            document.querySelectorAll('.add-to-cart').forEach(button => {
-                button.addEventListener('click', function() {
-                    const productName = this.getAttribute('data-product');
-                    addToCart(productName);
-                });
-            });
-        }
-
-        function addToCart(productName) {
-            fetch('http://localhost:8080/add-to-cart', {
+    function sendMessage() {
+        const message = inputMessage.value.trim();
+        if (message) {
+            displayMessage(message, 'user-msg');
+            fetch('http://localhost:8080/helpful-assistant', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ productName: productName, quantity: 1 })
+                body: JSON.stringify({ message: message })
             })
             .then(response => response.json())
             .then(data => {
-                displayMessage(data.message, 'assistant-msg');
+                displayMessage(data.response, 'assistant-msg');
             })
             .catch(error => {
                 console.error('Error:', error);
-                displayMessage('Sorry, there was an error adding the product to your cart.', 'assistant-msg');
+                displayMessage('Sorry, there was an error processing your request.', 'assistant-msg');
             });
+            inputMessage.value = '';
         }
-    </script>
+    }
+
+    function displayMessage(message, className) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', className);
+        messageElement.innerHTML = marked.parse(message);
+        messageArea.appendChild(messageElement);
+        messageArea.scrollTop = messageArea.scrollHeight;
+    }
+
+    const socket = new WebSocket('ws://localhost:8080/websocket');
+
+    socket.onmessage = function(event) {
+        const message = JSON.parse(event.data);
+        if (message.action === 'proposeProducts') {
+            displayProposedProducts(message.data);
+        } else if (message.action === 'displayShoppingCart') {
+            displayShoppingCart(message.data);
+        } else if (message.action === 'orderSuccessful') {
+            orderSuccessful();
+        } else if (message.action === 'requestProductData') {
+            sendProductDataToBackend();
+        } else if (message.action === 'chatMessage') {
+            displayMessage(message.data, 'assistant-msg');
+        } else if (message.action === 'landingPage') {
+            displayLandingPage();
+        }
+    };
+
+    function sendProductDataToBackend() {
+        const productsInCart = [];
+        document.querySelectorAll('.product-card').forEach(item => {
+            const name = item.querySelector('h3').innerText;
+            const quantityElement = item.querySelector('.product-quantity');
+            const quantity = parseInt(quantityElement.value, 10);
+            productsInCart.push({ name, quantity });
+        });
+
+        const message = {
+            action: 'requestProductData',
+            data: productsInCart
+        };
+
+        socket.send(JSON.stringify(message));
+    }
+
+    function displayProposedProducts(products) {
+    shoppingPanel.innerHTML = `
+            <h2>Product Selection</h2>
+            <p>You can change the quantities here</p>
+        `;
+        products.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.classList.add('product-card');
+            productCard.innerHTML = `
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <p><strong>Price per piece: $${product.price.toFixed(2)}</strong></p>
+                <p>Quantity: <input type="number" class="product-quantity" value="${product.quantity}" min="1" data-product="${product.name}"></p>
+                <button class="btn btn-sm btn-primary add-to-cart" data-product="${product.name}">Add to Cart</button>
+            `;
+            shoppingPanel.appendChild(productCard);
+        });
+
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const productName = this.getAttribute('data-product');
+                addToCart(productName);
+            });
+        });
+    }
+
+    function displayShoppingCart(products) {
+        const shoppingPanel = document.getElementById('shoppingPanel');
+        shoppingPanel.innerHTML = '<h2>Shopping Cart</h2>';
+
+        let totalPrice = 0;
+
+        products.forEach(product => {
+            const productTotal = product.price * product.quantity;
+            totalPrice += productTotal;
+
+            const productItem = document.createElement('div');
+            productItem.classList.add('product-item');
+            productItem.innerHTML = `
+                <p><strong>${product.name}</strong></p>
+                <p>Quantity: ${product.quantity}</p>
+                <p>Price per piece: $${product.price.toFixed(2)}</p>
+                <p>Total price: $${productTotal.toFixed(2)}</p>
+                <hr>
+            `;
+            shoppingPanel.appendChild(productItem);
+        });
+
+        const totalSection = document.createElement('div');
+        totalSection.classList.add('cart-summary');
+
+        const deliveryDate = new Date();
+        deliveryDate.setDate(deliveryDate.getDate() + 4);
+        const deliveryDateStr = deliveryDate.toLocaleDateString();
+
+        totalSection.innerHTML = `
+            <p><strong>Total price: $${totalPrice.toFixed(2)}</strong></p>
+            <p><strong>Delivery date: ${deliveryDateStr}</strong></p>
+            <p><strong>Delivery address: Frodo Baggins, 123 Underhill, The Shire</strong></p>
+            <button class="btn btn-sm btn-primary place-order">Place Order</button>
+        `;
+        shoppingPanel.appendChild(totalSection);
+    }
+
+    function orderSuccessful() {
+        const shoppingPanel = document.getElementById('shoppingPanel');
+        shoppingPanel.innerHTML = `
+            <h2>Order placed successfully!</h2>
+            <p>A confirmation email has been sent to your email address.</p>
+            <img src="/img/greatSuccess.jpg" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+        `;
+    }
+
+    function displayLandingPage() {
+        const shoppingPanel = document.getElementById('shoppingPanel');
+        shoppingPanel.innerHTML = `
+            <h1>Welcome to Bizarre Bazaar</h1>
+            <p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>
+            <img src="/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+        `;
+    }
+
+</script>
 </body>
 </html>

@@ -59,7 +59,6 @@ public class HelpfulAssistantResource {
             // TODO decision / state logic via Drools
 
             if (customShoppingState.getShoppingState().currentStep.startsWith("0")) {
-                myService.sendChatMessageToFrontend("Hi, welcome to Bizarre Bazaar, what would you need?", session);
                 customShoppingState.getShoppingState().moveToStep("1. Define desired products");
             }
 
