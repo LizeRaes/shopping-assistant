@@ -5,14 +5,17 @@ import dev.langchain4j.agent.tool.Tool;
 import engineering.epic.databases.ShoppingDatabase;
 import engineering.epic.endpoints.MyService;
 import engineering.epic.endpoints.MyWebSocket;
-import engineering.epic.models.CartItem;
 import engineering.epic.models.Product;
 import engineering.epic.state.CustomShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.websocket.Session;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @ApplicationScoped
 public class OrderTools {
@@ -32,65 +35,73 @@ public class OrderTools {
         this.customShoppingState = customShoppingState;
     }
 
-    @Tool("will display the shopping cart to the user, takes a comma-separated list of product names")
-    public void displayShoppingCart(JsonNode products) {
-        System.out.println("Calling displayShoppingCart() with products: " + products.toString());
-        // TODO one day, handle string literals :p
+    @Tool("Displays the shopping cart to the user. Takes a comma-separated string with product names and quantities in the format 'name1:quantity1,name2:quantity2'. Example: 'Apple:2,Banana:3'")
+    public void displayShoppingCart(String productsString) {
+        System.out.println("Calling displayShoppingCart() with products: " + productsString);
         customShoppingState.getShoppingState().moveToStep("3. Shopping cart");
         List<Map<String, Object>> productDetails = new ArrayList<>();
-        if (products.isArray()) {
-            for (JsonNode productNode : products) {
-                String name = productNode.get("name").asText();
-                int quantity = productNode.get("quantity").asInt();
-                if (quantity < 1) {
-                    continue;
-                }
+        String[] productsArray = productsString.split(",");
 
-                Product product = shoppingDatabase.getProductByName(name.trim());
-                if (product != null) {
-                    Map<String, Object> details = new HashMap<>();
-                    details.put("name", product.getName());
-                    details.put("description", product.getDescription());
-                    details.put("price", product.getPrice());
-                    details.put("quantity", quantity);
-                    productDetails.add(details);
-                }
+        for (String productEntry : productsArray) {
+            String[] productData = productEntry.split(":");
+
+            if (productData.length != 2) {
+                System.out.println("Invalid format for product entry: " + productEntry);
+                continue;
+            }
+
+            String name = productData[0].trim();
+            int quantity = Integer.parseInt(productData[1].trim());
+
+            Product product = shoppingDatabase.getProductByName(name);
+
+            if (product != null) {
+                Map<String, Object> details = new HashMap<>();
+                details.put("name", product.getName());
+                details.put("description", product.getDescription());
+                details.put("price", product.getPrice());  // Use actual price as a number
+                details.put("quantity", quantity);  // Use quantity as a number
+                productDetails.add(details);
             }
         }
-
-        // Send WebSocket message with product details including quantity
         myService.sendMessageToSession("displayShoppingCart", productDetails, myWebSocket.getSessionById());
     }
 
-    @Tool
-    public String addToCart(String productName, int quantity) {
-        System.out.println("Calling addToCart() with productName: " + productName + " and quantity: " + quantity);
-        Product product = shoppingDatabase.getProductByName(productName);
-        if (product == null) {
-            return "Product not found.";
-        }
-        CartItem cartItem = new CartItem(product, quantity);
-        shoppingDatabase.addToCart(cartItem);
-        return String.format("Added %d x %s to your cart.", quantity, productName);
+    @Tool("displays to the user that order was placed successfully")
+    public void displayOrderSuccessful() {
+        System.out.println("Calling displayOrderSuccess()");
+        customShoppingState.getShoppingState().moveToStep("5. Order placed");
+        Session session = myWebSocket.getSessionById();
+        myService.sendActionToSession("orderSuccessful", session);
     }
 
-//    @Tool
-//    public String checkout(String clientName, String address) {
-//        System.out.println("Calling checkout() with clientName: " + clientName + " and address: " + address);
-//        List<CartItem> cartItems = shoppingDatabase.getCartItems();
-//        if (cartItems.isEmpty()) {
-//            return "Your cart is empty. Add some items before checking out.";
-//        }
-//
-//        double total = cartItems.stream()
-//                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
-//                .sum();
-//
-//        Order order = new Order(clientName, address, cartItems, total);
-//        shoppingDatabase.saveOrder(order);
-//        shoppingDatabase.clearCart();
-//
-//        return String.format("Order placed successfully for %s. Total: $%.2f. Shipping to: %s",
-//                clientName, total, address);
-//    }
+    @Tool("fetch the selected products from frontend")
+    public void getSelectedProducts() {
+        System.out.println("Calling getSelectedProducts()");
+        Session session = myWebSocket.getSessionById();
+        CompletableFuture<JsonNode> requestedProducts = myService.sendActionAndWaitForResponse("requestProductData", session);
+        try {
+            JsonNode products = requestedProducts.get();  // blocks until the CompletableFuture is completed
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Tool("obtain confirmation that the order can be placed (true = yes)")
+    public boolean obtainConfirmation() {
+        System.out.println("Calling obtainConfirmation()");
+        Session session = myWebSocket.getSessionById();
+        CompletableFuture<JsonNode> askConfirmation = myService.sendActionAndWaitForResponse("askConfirmation", session);
+        try {
+            JsonNode confirmation = askConfirmation.get();  // blocks until the CompletableFuture is completed
+            boolean orderConfirmed = confirmation.asBoolean();
+            if(!orderConfirmed) {
+                customShoppingState.getShoppingState().moveToStep("4. Order cancelled");
+            }
+            return orderConfirmed;
+        } catch (Exception e) {
+            System.out.println("Unable to obtain confirmation: " + e.getMessage());
+            return false;
+        }
+    }
 }

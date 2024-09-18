@@ -166,6 +166,8 @@
             displayMessage(message.data, 'assistant-msg');
         } else if (message.action === 'landingPage') {
             displayLandingPage();
+        } else if (message.action === 'askConfirmation') {
+            askConfirmation();
         }
     };
 
@@ -248,6 +250,63 @@
             <button class="btn btn-sm btn-primary place-order">Place Order</button>
         `;
         shoppingPanel.appendChild(totalSection);
+    }
+
+    function askConfirmation() {
+        const shoppingPanel = document.getElementById('shoppingPanel');
+
+        // Create an overlay div to dim the background
+        const overlay = document.createElement('div');
+        overlay.style.position = 'absolute';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+
+        // Create a banner div for the confirmation message
+        const confirmationBanner = document.createElement('div');
+        confirmationBanner.style.position = 'absolute';
+        confirmationBanner.style.top = '20px';
+        confirmationBanner.style.right = '20px';  // Move the popup towards the upper right
+        confirmationBanner.style.backgroundColor = '#fff';
+        confirmationBanner.style.padding = '20px';
+        confirmationBanner.style.borderRadius = '8px';
+        confirmationBanner.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+        confirmationBanner.innerHTML = `
+            <p style="font-size: 18px; text-align: center;">Place order?</p>
+            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                <button id="confirm-yes" style="padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 5px;">Yes</button>
+                <button id="confirm-no" style="padding: 10px 20px; background-color: red; color: white; border: none; border-radius: 5px;">No</button>
+            </div>
+        `;
+
+        // Append the banner to the overlay and the overlay to the shoppingPanel
+        overlay.appendChild(confirmationBanner);
+        shoppingPanel.appendChild(overlay);
+
+        // Add event listeners for Yes and No buttons
+        document.getElementById('confirm-yes').addEventListener('click', () => {
+            sendConfirmation(true);
+            shoppingPanel.removeChild(overlay);  // Remove the overlay when the choice is made
+        });
+
+        document.getElementById('confirm-no').addEventListener('click', () => {
+            sendConfirmation(false);
+            shoppingPanel.removeChild(overlay);  // Remove the overlay when the choice is made
+        });
+    }
+
+    // The function to send confirmation back via WebSocket
+    function sendConfirmation(isConfirmed) {
+        const responseMessage = {
+            action: "askConfirmation",
+            data: isConfirmed
+        };
+        socket.send(JSON.stringify(responseMessage));  // Send via WebSocket
     }
 
     function orderSuccessful() {

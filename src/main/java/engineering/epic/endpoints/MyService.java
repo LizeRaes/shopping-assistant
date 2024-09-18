@@ -87,7 +87,7 @@ public class MyService {
             CompletableFuture<JsonNode> future = responseFutures.remove(futureKey);
 
             if (future != null) {
-                System.out.println("Completing future for action: " + action + " for connection: " + session.getId());
+                System.out.println("Completing future for action: " + action + " for connection: " + session.getId() + ", data: " + data);
                 future.complete(data);
             } else {
                 System.out.println("No future found for action: " + action + " for connection: " + session.getId());
