@@ -9,6 +9,10 @@ import engineering.epic.state.CustomShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,7 +55,7 @@ public class ShoppingTools {
     }
 
     @Tool("will cleanly display the proposed products to the user, takes a comma-separated list of product names")
-    // TODO would ideally propose quantity per product too but we can probably get away without
+    // TODO one day, allow LLM to set quantity
     public void proposeProductSelection(String productNames) {
         System.out.println("Calling proposeProductSelection() with productNames: " + productNames);
         // TODO one day, handle string literals :p
@@ -78,4 +82,25 @@ public class ShoppingTools {
         myService.sendMessageToSession("proposeProducts", productDetails, myWebSocket.getSessionById());
     }
 
+    // this dangerous tool is here to demonstrate the risks of prompt / sql injection
+    @Tool("""
+            allows to perform any sql on the shopping database that has the following tables: Tables: 
+            products (id, name, price, price_display, picture, description),
+            clients (id, name, favorite_color, pricing_setting, favorite_style, budget_profile, address),
+            orders (id, client_id, product_id, quantity)
+            """)
+    public String performSqlOnDatabase(String sqlQuery) {
+        System.out.println("Calling performSqlOnDatabase() with sqlQuery: " + sqlQuery);
+        try (Connection conn = DriverManager.getConnection(ShoppingDatabase.DB_URL);
+             Statement stmt = conn.createStatement()) {
+            boolean success = stmt.execute(sqlQuery);
+            if (success) {
+                return stmt.getResultSet().toString();
+            } else {
+                return "Could not fetch result";
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

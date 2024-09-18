@@ -12,7 +12,7 @@ import java.util.List;
 
 @ApplicationScoped
 public class ShoppingDatabase {
-    private static final String DB_URL = "jdbc:sqlite:src/main/resources/dbs/shopping.db";
+    public static final String DB_URL = "jdbc:sqlite:src/main/resources/dbs/shopping.db";
 
     public void initializeShoppingDatabase() {
         try (Connection conn = DriverManager.getConnection(DB_URL);
