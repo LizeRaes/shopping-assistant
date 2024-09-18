@@ -12,6 +12,7 @@ public class ShoppingState implements Serializable {
     private static final long serialVersionUID = 1L;
 
     final String STEPS = """
+            0. New Session
             1. Define desired products
             2. Proposed products
             3. Shopping cart

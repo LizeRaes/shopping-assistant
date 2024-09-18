@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class ShoppingTools {
+public class ProdSelectionTools {
 
     @Inject
     ShoppingDatabase shoppingDatabase;
@@ -30,7 +30,7 @@ public class ShoppingTools {
 
     CustomShoppingState customShoppingState;
 
-    public ShoppingTools(CustomShoppingState customShoppingState) {
+    public ProdSelectionTools(CustomShoppingState customShoppingState) {
         this.customShoppingState = customShoppingState;
     }
 

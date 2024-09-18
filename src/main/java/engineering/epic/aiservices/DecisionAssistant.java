@@ -3,13 +3,13 @@ package engineering.epic.aiservices;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import engineering.epic.tools.ShoppingTools;
+import engineering.epic.tools.ProdSelectionTools;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import jakarta.enterprise.context.ApplicationScoped;
 
 //TODO make it all sessionscoped so state and memory are refreshed when reloading the page?
 @ApplicationScoped
-@RegisterAiService(tools = ShoppingTools.class)
+@RegisterAiService(tools = ProdSelectionTools.class)
 public interface DecisionAssistant {
 
     @SystemMessage("""

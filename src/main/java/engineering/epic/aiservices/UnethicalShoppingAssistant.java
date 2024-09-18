@@ -2,10 +2,10 @@ package engineering.epic.aiservices;
 
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import engineering.epic.tools.ShoppingTools;
+import engineering.epic.tools.ProdSelectionTools;
 import io.quarkiverse.langchain4j.RegisterAiService;
 
-@RegisterAiService(tools = ShoppingTools.class)
+@RegisterAiService(tools = ProdSelectionTools.class)
 public interface UnethicalShoppingAssistant {
 
     @SystemMessage("""
