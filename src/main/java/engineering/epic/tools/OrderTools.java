@@ -76,19 +76,25 @@ public class OrderTools {
     }
 
     @Tool("fetch the selected products from frontend")
-    public void getSelectedProducts() {
+    public JsonNode getSelectedProducts() {
         System.out.println("Calling getSelectedProducts()");
         Session session = myWebSocket.getSessionById();
         CompletableFuture<JsonNode> requestedProducts = myService.sendActionAndWaitForResponse("requestProductData", session);
         try {
-            JsonNode products = requestedProducts.get();  // blocks until the CompletableFuture is completed
+            return requestedProducts.get();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return null;
         }
     }
 
     @Tool("obtain confirmation that the order can be placed (true = yes)")
     public boolean obtainConfirmation() {
+        try { // give the user a break to see the shopping cart
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
         System.out.println("Calling obtainConfirmation()");
         Session session = myWebSocket.getSessionById();
         CompletableFuture<JsonNode> askConfirmation = myService.sendActionAndWaitForResponse("askConfirmation", session);
