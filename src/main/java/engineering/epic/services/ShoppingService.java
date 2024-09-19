@@ -1,6 +1,6 @@
 package engineering.epic.services;
 
-import engineering.epic.tools.ProdSelectionTools;
+import engineering.epic.tools.DecisionTools;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -8,7 +8,7 @@ import jakarta.inject.Inject;
 public class ShoppingService {
 
     @Inject
-    ProdSelectionTools shoppingTools;
+    DecisionTools shoppingTools;
 
     public String getProductList() {
         return shoppingTools.getProductList();

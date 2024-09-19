@@ -16,9 +16,9 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 @Path("/helpful-assistant")
-public class HelpfulAssistantResource {
+public class AssistantResource {
 
-    private static final Logger logger = Logger.getLogger(HelpfulAssistantResource.class);
+    private static final Logger logger = Logger.getLogger(AssistantResource.class);
     private static final String CONTINUE_QUESTION_1 = "I've proposed products for you, do you want to add anything else?";
     private static final String CONTINUE_QUESTION_4 = "Would you like to continue shopping?";
 

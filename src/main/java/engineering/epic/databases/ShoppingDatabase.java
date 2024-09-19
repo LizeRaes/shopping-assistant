@@ -143,4 +143,9 @@ public class ShoppingDatabase {
             System.out.println("Database file does not exist.");
         }
     }
+
+    public Product getProductByNameAndUser(String name, Integer userId) {
+        // TODO
+        return getProductByName(name);
+    }
 }

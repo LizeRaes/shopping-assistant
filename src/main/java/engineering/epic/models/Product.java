@@ -62,4 +62,14 @@ public class Product {
                 ", description='" + description + '\'' +
                 '}';
     }
+
+    public Object getPricingScheme() {
+        // TODO
+        return "discount";
+    }
+
+    public Object getMaxImposableQuantity() {
+        // TODO
+        return 10;
+    }
 }
