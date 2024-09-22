@@ -110,19 +110,34 @@ public class ShoppingDatabase {
         return new ArrayList<>(cart);
     }
 
-    public void saveOrder(Order order) {
+    public void saveOrder(int userId, Order order) {
         String sql = "INSERT INTO orders (client_id, product_id, quantity) VALUES (?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (CartItem item : order.getItems()) {
-                pstmt.setInt(1, 1); // Assuming client_id is 1 for simplicity
-                pstmt.setInt(2, 1); // Assuming product_id is 1 for simplicity
+                pstmt.setInt(1, userId); // Use the provided userId
+                pstmt.setInt(2, getProductIdByName(item.getProduct().getName())); // Get the correct product_id
                 pstmt.setInt(3, item.getQuantity());
                 pstmt.executeUpdate();
             }
         } catch (SQLException e) {
             System.out.println("Error saving order: " + e.getMessage());
         }
+    }
+
+    private int getProductIdByName(String productName) {
+        String sql = "SELECT id FROM products WHERE name = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, productName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving product ID: " + e.getMessage());
+        }
+        return -1; // Return -1 if product not found
     }
 
     public void clearCart() {

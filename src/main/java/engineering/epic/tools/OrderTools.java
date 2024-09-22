@@ -6,6 +6,7 @@ import engineering.epic.databases.ShoppingDatabase;
 import engineering.epic.endpoints.MyService;
 import engineering.epic.endpoints.MyWebSocket;
 import engineering.epic.models.CartItem;
+import engineering.epic.models.Order;
 import engineering.epic.models.Product;
 import engineering.epic.state.CustomShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -38,6 +39,7 @@ public class OrderTools {
         // TODO one day, handle string literals :p
         customShoppingState.getShoppingState().moveToStep("3. Shopping cart");
         List<Map<String, Object>> productDetails = new ArrayList<>();
+        List<CartItem> cartItems = new ArrayList<>();
         if (products.isArray()) {
             for (JsonNode productNode : products) {
                 String name = productNode.get("name").asText();
@@ -54,12 +56,20 @@ public class OrderTools {
                     details.put("price", product.getPrice());
                     details.put("quantity", quantity);
                     productDetails.add(details);
+
+                    CartItem cartItem = new CartItem(product, quantity);
+                    cartItems.add(cartItem);
                 }
             }
         }
 
         // Send WebSocket message with product details including quantity
         myService.sendMessageToSession("displayShoppingCart", productDetails, myWebSocket.getSessionById());
+
+        // Save the order in the database
+        Order order = new Order();
+        order.setItems(cartItems);
+        shoppingDatabase.saveOrder(myWebSocket.getUserId(), order);
     }
 
     @Tool

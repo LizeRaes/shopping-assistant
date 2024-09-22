@@ -119,7 +119,8 @@ public class HelpfulAssistantResource {
 
                     System.out.println("--- STEP 4 ---");
                     customShoppingState.getShoppingState().moveToStep("4. Order placed");
-                    // TODO order this input in db (create order in database, frontend: leave 'Shopping Cart' page there for 5s, then move over to 'order successful'
+                    // Save the order in the database
+                    orderTools.saveOrder(myWebSocket.getUserId(), products);
                     myService.sendActionToSession("orderSuccessful", session);
                     System.out.println("That will land on your doorstep soon :) Would you like to continue shopping?");
                     MessageResponse response = new MessageResponse(CONTINUE_QUESTION_4);
