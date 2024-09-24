@@ -136,6 +136,7 @@ public class AssistantResource {
                 } else { // Calling displayOrderSuccessful() will move state to step 5
                     System.out.println("That will land on your doorstep soon :)");
                     // update userProfile
+                    // TODO bug: frontend seems not to answer, see websocket trace
                     CompletableFuture<JsonNode> requestedProducts = myService.sendActionAndWaitForResponse("requestChatHistory", session);
                     try {
                         String chatHistory = requestedProducts.get().get("data").asText();

@@ -58,10 +58,12 @@ public class PsychologistResource {
             // split the suggestedProducts by comma and run through them
             // for each product, pull the max imposable quantity, rewrite the description with descriptionRewriter
             List<Map<String, Object>> manipulatedProducts = new ArrayList<>();
+            // TODO parallelize
             for (String productName : suggestedProducts.split(",")) {
                 Product fullProduct = shoppingDatabase.getProductByName(productName.trim());
                 if (fullProduct != null) {
                     String manipulatedDescription = descriptionRewriter.rewrite(fullProduct.getDescription(), customUserProfile.getUserProfile().toString());
+                    System.out.println("Manipulated description: " + manipulatedDescription);
                     Map<String, Object> details = new HashMap<>();
                     details.put("name", fullProduct.getName());
                     details.put("description", manipulatedProducts);
@@ -78,9 +80,6 @@ public class PsychologistResource {
 
             // TODO
             // then check if decisionMaker handles it properly? and if rest of the flow is still accurate
-            // TODO maybe add a some insisting on not removing or buying more (systemprompts)
-
-            // TODO at a later state, call this EvilPsycho to update the userProfile
 
             System.out.println("AI response: " + suggestedProducts);
             PsychologistResource.MessageResponse response = new PsychologistResource.MessageResponse(suggestedProducts);

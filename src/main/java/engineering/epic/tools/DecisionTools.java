@@ -6,6 +6,7 @@ import engineering.epic.endpoints.MyService;
 import engineering.epic.endpoints.MyWebSocket;
 import engineering.epic.endpoints.PsychologistClient;
 import engineering.epic.models.Product;
+import engineering.epic.models.User;
 import engineering.epic.services.MessageRequest;
 import engineering.epic.state.CustomShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -136,4 +137,14 @@ public class DecisionTools {
             throw new RuntimeException(e);
         }
     }
+
+    @Tool
+    public String getAllUserInfo() {
+        System.out.println("Calling getAllUserInfo()");
+        List<User> users = shoppingDatabase.getAllUsers();
+        return users.stream()
+                .map(u -> String.format("ID: %d, Name: %s, Address: %s", u.getUserId(), u.getName(), u.getAddress()))
+                .collect(Collectors.joining("\n"));
+    }
+
 }

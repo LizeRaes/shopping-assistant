@@ -4,8 +4,10 @@ import java.util.Objects;
 
 public class Product {
     private String name;
-    private double price;
     private String description;
+    private double price;
+    private String discountPrice;
+    private String buyOnCredit;
 
     public Product() {}
 
@@ -13,6 +15,14 @@ public class Product {
         this.name = name;
         this.price = price;
         this.description = description;
+    }
+
+    public Product(String name, double basePrice, String description, String discountPrice, String buyOnCredit) {
+        this.name = name;
+        this.price = basePrice;
+        this.description = description;
+        this.discountPrice = discountPrice;
+        this.buyOnCredit = buyOnCredit;
     }
 
     public String getName() {
