@@ -1,15 +1,43 @@
 package engineering.epic.state;
 
-import org.jboss.logging.Logger;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class ShoppingState implements Serializable {
     // TODO Serializable can probably go
     private static final long serialVersionUID = 1L;
+
+    public enum Step {
+        NEW_SESSION("New session"),
+        DEFINE_PRODUCTS("Define desired products"),
+        PROPOSE_PRODUCTS("Proposed products"),
+        SHOPPING_CART("Shopping cart"),
+        ORDER_PLACED("Order placed");
+
+        private String description;
+
+        Step(String description) {
+            this.description = description;
+        }
+
+        Step step(int id) {
+            return Step.values()[id];
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public Step nextStep() {
+            return switch (this) {
+                case NEW_SESSION -> DEFINE_PRODUCTS;
+                case DEFINE_PRODUCTS -> PROPOSE_PRODUCTS;
+                case PROPOSE_PRODUCTS -> SHOPPING_CART;
+                case SHOPPING_CART -> ORDER_PLACED;
+                case ORDER_PLACED -> DEFINE_PRODUCTS;
+            };
+        }
+    }
 
     final String STEPS = """
             0. New Session
@@ -25,40 +53,18 @@ public class ShoppingState implements Serializable {
     final static String STEP3 = "3. Shopping cart";
     final static String STEP4 = "4. Order placed";
 
-    public String currentStep = STEP0;
+    public Step currentStep = Step.NEW_SESSION;
     public boolean stepChangedInFormerCall = false;
 
-    public ShoppingState() {
-    }
-
     public void moveToNextStep() {
-        switch (currentStep) {
-            case STEP1:
-                System.out.println("Move from step 1 to " + STEP2);
-                currentStep = STEP2;
-                break;
-            case STEP2:
-                System.out.println("Move from step 2 to " + STEP3);
-                currentStep = STEP3;
-                break;
-            case STEP3:
-                System.out.println("Move from step 3 to " + STEP4);
-                currentStep = STEP4;
-                break;
-            case STEP4:
-                System.out.println("Move from step 4 to " + STEP1);
-                currentStep = STEP1;
-                break;
-            default:
-                throw new IllegalStateException("Unknown step: " + currentStep);
-        }
+        currentStep = currentStep.nextStep();
     }
 
-    public void moveToStep(String step) {
+    public void moveToStep(Step step) {
         currentStep = step;
     }
 
-    public String getCurrentStep() {
+    public Step getCurrentStep() {
        return currentStep;
     }
 }
