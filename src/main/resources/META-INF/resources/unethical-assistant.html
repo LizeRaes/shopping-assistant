@@ -111,6 +111,10 @@
     const messageArea = document.getElementById('messageArea');
     const shoppingPanel = document.getElementById('shoppingPanel');
 
+    window.onload = function() {
+        console.log("Page loaded and DOM ready");
+    };
+
     sendButton.addEventListener('click', sendMessage);
     inputMessage.addEventListener('keypress', function(event) {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -153,6 +157,7 @@
     const socket = new WebSocket('ws://localhost:8080/websocket');
 
     socket.onmessage = function(event) {
+        console.log("received message");
         const message = JSON.parse(event.data);
         if (message.action === 'proposeProducts') {
             displayProposedProducts(message.data);
@@ -167,6 +172,8 @@
         } else if (message.action === 'landingPage') {
             displayLandingPage();
         } else if (message.action === 'askConfirmation') {
+            askConfirmation();
+        } else if (message.action === 'requestChatHistory') {
             askConfirmation();
         }
     };
@@ -186,6 +193,10 @@
         };
 
         socket.send(JSON.stringify(message));
+    }
+
+    function sendChatHistoryToBackend() {
+        sendConfirmation(true);
     }
 
     function displayProposedProducts(products) {

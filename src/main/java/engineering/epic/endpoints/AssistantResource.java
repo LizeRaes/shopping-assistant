@@ -1,9 +1,12 @@
 package engineering.epic.endpoints;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import engineering.epic.aiservices.DecisionAssistant;
 import engineering.epic.aiservices.FinalSelectionDecider;
 import engineering.epic.aiservices.OrderAssistant;
+import engineering.epic.aiservices.ProfileUpdater;
 import engineering.epic.state.CustomShoppingState;
+import engineering.epic.state.CustomUserProfile;
 import engineering.epic.tools.OrderTools;
 import jakarta.inject.Inject;
 import jakarta.websocket.Session;
@@ -14,6 +17,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
+
+import java.util.concurrent.CompletableFuture;
 
 @Path("/helpful-assistant")
 public class AssistantResource {
@@ -32,6 +37,9 @@ public class AssistantResource {
     FinalSelectionDecider finalSelectionDecider;
 
     @Inject
+    ProfileUpdater profileUpdater;
+
+    @Inject
     MyWebSocket myWebSocket;
 
     @Inject
@@ -39,6 +47,9 @@ public class AssistantResource {
 
     @Inject
     CustomShoppingState customShoppingState;
+
+    @Inject
+    CustomUserProfile customUserProfile;
 
     @Inject
     OrderTools orderTools;
@@ -56,6 +67,7 @@ public class AssistantResource {
             // TODO decision / state logic via Drools
 
             if (customShoppingState.getShoppingState().currentStep.startsWith("0")) {
+                System.out.println("Original user profile: " + customUserProfile.getUserProfile().toString());
                 customShoppingState.getShoppingState().moveToStep("1. Define desired products");
             }
 
@@ -123,6 +135,19 @@ public class AssistantResource {
                     myService.sendChatMessageToFrontend("No problem, your order is cancelled", session);
                 } else { // Calling displayOrderSuccessful() will move state to step 5
                     System.out.println("That will land on your doorstep soon :)");
+                    // update userProfile
+                    CompletableFuture<JsonNode> requestedProducts = myService.sendActionAndWaitForResponse("requestChatHistory", session);
+                    try {
+                        String chatHistory = requestedProducts.get().get("data").asText();
+
+                        String result = profileUpdater.updateProfile(customUserProfile.getUserProfile().toString(), chatHistory);
+                        // TODO remove
+                        System.out.println("ProfileUpdater answer: " + result);
+                        System.out.println("Updated user profile: " + customUserProfile.getUserProfile().toString());
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }
                     myService.sendChatMessageToFrontend("A package will land on your doorstep soon :)", session);
                 }
                 MessageResponse response = new MessageResponse(CONTINUE_QUESTION_4);

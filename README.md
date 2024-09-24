@@ -15,7 +15,7 @@ In terminal, run `quarkus dev` in the project root directory
 
 On the main branch:
 1. The webshop with helpful stateful assistant will be served at `http://localhost:8080/helpful-assistant.html`
-2. The webshop with helpful stateless assistant (LLM decides on transitions) will be served at `http://localhost:8080/no-state-assistant.html`
+2. The webshop with helpful stateless assistant (LLM decides on transitions) will be served at `http://localhost:8080/helpful-assistant-no-state.html`
 
 On the helpful-with-confirmation branch:
 1. The webshop with helpful stateful assistant asking for human confirmation, will be served at `http://localhost:8080/helpful-assistant.html`

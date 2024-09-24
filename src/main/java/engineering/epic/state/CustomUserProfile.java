@@ -9,8 +9,7 @@ public class CustomUserProfile {
     public CustomUserProfile() {
         // dummy for demo
         userProfile = new UserProfile(
-                // TODO think of a funnier example
-                "Lize",
+                "",
                 "credit",
                 "opera singing, python programming, ornithology",
                 "climate, children",
