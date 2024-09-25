@@ -16,10 +16,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutorService;
 
 @Path("/unethical-assistant")
 public class PsychologistResource {
@@ -49,6 +50,7 @@ public class PsychologistResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response handleMessage(MessageRequest request) {
         try {
+            Integer userId = myWebSocket.getUserId();
             String userNeeds = request.getMessage();
             logger.info("EvilPsychologist received message: " + userNeeds);
 
@@ -57,29 +59,8 @@ public class PsychologistResource {
 
             // split the suggestedProducts by comma and run through them
             // for each product, pull the max imposable quantity, rewrite the description with descriptionRewriter
-            List<Map<String, Object>> manipulatedProducts = new ArrayList<>();
-            // TODO parallelize
-            for (String productName : suggestedProducts.split(",")) {
-                Product fullProduct = shoppingDatabase.getProductByName(productName.trim());
-                if (fullProduct != null) {
-                    String manipulatedDescription = descriptionRewriter.rewrite(fullProduct.getDescription(), customUserProfile.getUserProfile().toString());
-                    System.out.println("Manipulated description: " + manipulatedDescription);
-                    Map<String, Object> details = new HashMap<>();
-                    details.put("name", fullProduct.getName());
-                    details.put("description", manipulatedProducts);
-                    details.put("price", fullProduct.getPrice());
-                    details.put("pricingScheme", fullProduct.getPricingScheme());
-                    manipulatedProducts.add(details);
-                }
-            }
-
-            // TODO extend db to store also this f(userId) primary keys userId + productId and update it on each order
-            Integer userId = myWebSocket.getUserId();
-            // TODO save the manipulatedProducts to the db with userId
-
-
-            // TODO
-            // then check if decisionMaker handles it properly? and if rest of the flow is still accurate
+            List<String> suggestedProductList = Arrays.asList(suggestedProducts.split(","));
+            parallelizeWithVirtualThreads(suggestedProductList); // parallel bcs LLM calls take time
 
             System.out.println("AI response: " + suggestedProducts);
             PsychologistResource.MessageResponse response = new PsychologistResource.MessageResponse(suggestedProducts);
@@ -90,6 +71,34 @@ public class PsychologistResource {
                     .entity(new MessageResponse("An error occurred while processing your request."))
                     .build();
         }
+    }
+
+    public void parallelizeWithVirtualThreads(List<String> suggestedProducts) {
+        ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+        List<Future<Void>> futures = new ArrayList<>();
+
+        for (String productName : suggestedProducts) {
+            Future<Void> future = executorService.submit(() -> {
+                Product fullProduct = shoppingDatabase.getProductByName(productName.trim());
+                if (fullProduct != null) {
+                    String manipulatedDescription = descriptionRewriter.rewrite(fullProduct.getDescription(), customUserProfile.getUserProfile().toString());
+                    System.out.println("Manipulated description: " + manipulatedDescription);
+                    shoppingDatabase.setTailoredProductDescription(myWebSocket.getUserId(), productName.trim(), manipulatedDescription);
+                }
+                return null;
+            });
+            futures.add(future);
+        }
+        for (Future<Void> future : futures) {
+            try {
+                future.get(); // Block until the task is complete
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Shutdown the executor service
+        executorService.shutdown();
     }
 
     public static class MessageResponse {

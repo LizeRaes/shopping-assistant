@@ -10,7 +10,7 @@ public class CustomUserProfile {
         // dummy for demo
         userProfile = new UserProfile(
                 "",
-                "credit",
+                "oncredit",
                 "opera singing, python programming, ornithology",
                 "climate, children",
                 "red shoes with heels, milk chocolate, cat luxury items",

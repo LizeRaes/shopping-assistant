@@ -61,7 +61,7 @@ public class MyService {
                         "data", data
                 ));
                 session.getBasicRemote().sendText(message);
-                System.out.println("Sent message to session: " + session.getId());
+                System.out.println("Sent message to session: " + session.getId() + ", action: " + action + ", data: " + data);
 
             } catch (Exception e) {
                 System.out.println("Error sending message: " + e.getMessage());
@@ -71,28 +71,20 @@ public class MyService {
         }
     }
 
-    // Handle responses as before
     public void handleIncomingMessage(String message, Session session) {
         try {
-            // Parse the received message as JSON
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonMessage = objectMapper.readTree(message);
-
-            // Extract action and data from the JSON
             String action = jsonMessage.get("action").asText();
             JsonNode data = jsonMessage.get("data");
-
-            // Use action and connectionId to find the corresponding future
             String futureKey = session.getId() + ":" + action;
             CompletableFuture<JsonNode> future = responseFutures.remove(futureKey);
-
             if (future != null) {
                 System.out.println("Completing future for action: " + action + " for connection: " + session.getId() + ", data: " + data);
                 future.complete(data);
             } else {
                 System.out.println("No future found for action: " + action + " for connection: " + session.getId());
             }
-
         } catch (Exception e) {
             System.out.println("Error processing incoming WebSocket message: " + e.getMessage());
         }

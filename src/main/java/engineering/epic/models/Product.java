@@ -69,17 +69,30 @@ public class Product {
         return "Product{" +
                 "name='" + name + '\'' +
                 ", price=" + price +
+                ", discountPrice='" + discountPrice + '\'' +
+                ", buyOnCredit='" + buyOnCredit + '\'' +
                 ", description='" + description + '\'' +
                 '}';
-    }
-
-    public Object getPricingScheme() {
-        // TODO
-        return "discount";
     }
 
     public Object getMaxImposableQuantity() {
         // TODO
         return 10;
+    }
+
+    public String getDiscountPrice() {
+        return discountPrice;
+    }
+
+    public void setDiscountPrice(String discountPrice) {
+        this.discountPrice = discountPrice;
+    }
+
+    public String getBuyOnCredit() {
+        return buyOnCredit;
+    }
+
+    public void setBuyOnCredit(String buyOnCredit) {
+        this.buyOnCredit = buyOnCredit;
     }
 }

@@ -47,9 +47,10 @@ public class ShoppingDatabase {
 
             // Insert sample products with sensible prices
             String insertProductsSQL = "INSERT INTO products (name, base_price, discount_price, buy_on_credit, picture, description) VALUES " +
-                    "('Chocolate Bar', 2.99, '2.50$ instead of 2.99$', '0.50$ per month over 6 months', 'chocolate.jpg', 'Delicious milk chocolate bar')," +
-                    "('Baby Bottle 1', 9.99, '7.99$ instead of 9.99$', '1.99$ per month over 5 months', 'bottle1.jpg', 'BPA-free baby bottle, 8 oz')," +
-                    "('Diapers', 19.99, '17.99$ instead of 19.99$', '2.99$ per month over 7 months', 'diapers.jpg', 'Pack of 50 disposable diapers, size 3')";
+                    "('Chocolate Bar', 2.99, '3.19$ instead of 3.85$', '0.50$ per month over 8 months', 'chocolate.jpg', 'Delicious milk chocolate bar')," +
+                    "('Baby Bottle 1', 9.99, '11.99$ instead of 15.99$', '1.99$ per month over 6 months', 'bottle1.jpg', 'BPA-free baby bottle, 8 oz')," +
+                    "('Baby Bottle 2', 16.99, '17.99$ instead of 30.05$', '2.99$ per month over 7 months', 'bottle1.jpg', 'BPA-free baby bottle, 8 oz')," +
+                    "('Diapers', 17.99, '19.99$ instead of 25.50$', '2.99$ per month over 8 months', 'diapers.jpg', 'Pack of 50 disposable diapers, size 3')";
             stmt.execute(insertProductsSQL);
 
             // Insert a sample user
@@ -82,19 +83,31 @@ public class ShoppingDatabase {
     }
 
     // Set a tailored product description for a user
-    public void setTailoredProductDescription(int userId, int productId, String tailoredDescription) {
-        String sql = "INSERT OR REPLACE INTO tailored_descriptions (userId, product_id, tailored_description) VALUES (?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            pstmt.setInt(2, productId);
-            pstmt.setString(3, tailoredDescription);
-            pstmt.executeUpdate();
-            System.out.println("Tailored description set for userId: " + userId + ", productId: " + productId);
+    public void setTailoredProductDescription(int userId, String productName, String tailoredDescription) {
+        String getProductSql = "SELECT id FROM products WHERE name = ?";
+        String insertOrUpdateSql = "INSERT OR REPLACE INTO tailored_descriptions (userId, product_id, tailored_description) VALUES (?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            try (PreparedStatement getProductStmt = conn.prepareStatement(getProductSql)) {
+                getProductStmt.setString(1, productName);
+                ResultSet rs = getProductStmt.executeQuery();
+                if (rs.next()) {
+                    int productId = rs.getInt("id");
+                    try (PreparedStatement pstmt = conn.prepareStatement(insertOrUpdateSql)) {
+                        pstmt.setInt(1, userId);
+                        pstmt.setInt(2, productId);
+                        pstmt.setString(3, tailoredDescription);
+                        pstmt.executeUpdate();
+                        System.out.println("Tailored description set for userId: " + userId + ", product: " + productName);
+                    }
+                } else {
+                    System.out.println("Product not found: " + productName);
+                }
+            }
         } catch (SQLException e) {
             System.out.println("Error setting tailored description: " + e.getMessage());
         }
     }
+
 
     // Retrieve a tailored product description for a user and product
     public String getTailoredDescription(int userId, String productName) {

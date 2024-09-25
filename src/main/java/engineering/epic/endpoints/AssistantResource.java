@@ -1,6 +1,7 @@
 package engineering.epic.endpoints;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import engineering.epic.aiservices.DecisionAssistant;
 import engineering.epic.aiservices.FinalSelectionDecider;
 import engineering.epic.aiservices.OrderAssistant;
@@ -136,13 +137,10 @@ public class AssistantResource {
                 } else { // Calling displayOrderSuccessful() will move state to step 5
                     System.out.println("That will land on your doorstep soon :)");
                     // update userProfile
-                    // TODO bug: frontend seems not to answer, see websocket trace
                     CompletableFuture<JsonNode> requestedProducts = myService.sendActionAndWaitForResponse("requestChatHistory", session);
                     try {
-                        String chatHistory = requestedProducts.get().get("data").asText();
-
+                        String chatHistory = requestedProducts.get().asText();
                         String result = profileUpdater.updateProfile(customUserProfile.getUserProfile().toString(), chatHistory);
-                        // TODO remove
                         System.out.println("ProfileUpdater answer: " + result);
                         System.out.println("Updated user profile: " + customUserProfile.getUserProfile().toString());
                     } catch (Exception e) {

@@ -174,9 +174,27 @@
         } else if (message.action === 'askConfirmation') {
             askConfirmation();
         } else if (message.action === 'requestChatHistory') {
-            askConfirmation();
+            sendChatHistoryToBackend();
         }
     };
+
+    function sendChatHistoryToBackend() {
+       console.log("sendChatHistoryToBackend called");
+       const messages = [];
+       document.querySelectorAll('.message').forEach(messageElement => {
+           const role = messageElement.classList.contains('user-msg') ? 'User' : 'Assistant';
+           const messageText = messageElement.textContent.trim();
+           messages.push(`${role}: ${messageText}`);
+       });
+       const chatHistory = messages.join('\n');
+       console.log("chatHistory: " + chatHistory);
+       const message = {
+           action: 'requestChatHistory',
+           data: chatHistory
+       };
+       socket.send(JSON.stringify(message));
+    }
+
 
     function sendProductDataToBackend() {
         const productsInCart = [];
@@ -195,10 +213,6 @@
         socket.send(JSON.stringify(message));
     }
 
-    function sendChatHistoryToBackend() {
-        sendConfirmation(true);
-    }
-
     function displayProposedProducts(products) {
     shoppingPanel.innerHTML = `
             <h2>Product Selection</h2>
@@ -210,7 +224,7 @@
             productCard.innerHTML = `
                 <h3>${product.name}</h3>
                 <p>${product.description}</p>
-                <p><strong>Price per piece: $${product.price.toFixed(2)}</strong></p>
+                <p><strong>Price per piece: ${product.price}</strong></p>
                 <p>Quantity: <input type="number" class="product-quantity" value="${product.quantity}" min="1" data-product="${product.name}"></p>
                 <button class="btn btn-sm btn-primary add-to-cart" data-product="${product.name}">Add to Cart</button>
             `;
