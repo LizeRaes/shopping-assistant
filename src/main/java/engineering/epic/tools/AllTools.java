@@ -113,31 +113,23 @@ public class AllTools {
         myService.sendActionToSession("orderSuccessful", session);
     }
 
-    @Tool("will display the shopping cart to the user, takes a comma-separated list of product names")
-    public void displayTheShoppingCart(JsonNode products) {
-        System.out.println("Calling displayShoppingCart() with products: " + products.toString());
-        // TODO one day, handle string literals :p
-        customShoppingState.getShoppingState().moveToStep("3. Shopping cart");
+    @Tool("Displays the shopping cart to the user. Takes a comma-separated string with product names")
+    public void displayTheShoppingCart(String productsString) {
+        System.out.println("Calling displayTheShoppingCart() with products: " + productsString);
         List<Map<String, Object>> productDetails = new ArrayList<>();
-        if (products.isArray()) {
-            for (JsonNode productNode : products) {
-                String name = productNode.get("name").asText();
-                int quantity = productNode.get("quantity").asInt();
-                if (quantity < 1) {
-                    continue;
-                }
-
-                Product product = shoppingDatabase.getProductByName(name.trim());
-                if (product != null) {
-                    Map<String, Object> details = new HashMap<>();
-                    details.put("name", product.getName());
-                    details.put("description", product.getDescription());
-                    details.put("price", product.getPrice());
-                    details.put("quantity", quantity);
-                    productDetails.add(details);
-                }
+        String[] productsArray = productsString.split(",");
+        for (String name : productsArray) {
+            Product product = shoppingDatabase.getProductByName(name.trim());
+            if (product != null) {
+                Map<String, Object> details = new HashMap<>();
+                details.put("name", product.getName());
+                details.put("description", product.getDescription());
+                details.put("price", product.getPrice());
+                details.put("quantity", 1);
+                productDetails.add(details);
             }
         }
+        System.out.println("Sending displayShoppingCart message with productDetails: " + productDetails);
+        myService.sendMessageToSession("displayShoppingCart", productDetails, myWebSocket.getSessionById());
     }
-
 }

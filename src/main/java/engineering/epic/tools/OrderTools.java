@@ -74,23 +74,4 @@ public class OrderTools {
         return String.format("Added %d x %s to your cart.", quantity, productName);
     }
 
-//    @Tool
-//    public String checkout(String clientName, String address) {
-//        System.out.println("Calling checkout() with clientName: " + clientName + " and address: " + address);
-//        List<CartItem> cartItems = shoppingDatabase.getCartItems();
-//        if (cartItems.isEmpty()) {
-//            return "Your cart is empty. Add some items before checking out.";
-//        }
-//
-//        double total = cartItems.stream()
-//                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
-//                .sum();
-//
-//        Order order = new Order(clientName, address, cartItems, total);
-//        shoppingDatabase.saveOrder(order);
-//        shoppingDatabase.clearCart();
-//
-//        return String.format("Order placed successfully for %s. Total: $%.2f. Shipping to: %s",
-//                clientName, total, address);
-//    }
 }
