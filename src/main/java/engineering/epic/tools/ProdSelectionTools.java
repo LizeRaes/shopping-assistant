@@ -9,10 +9,7 @@ import engineering.epic.state.CustomShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,21 +83,46 @@ public class ProdSelectionTools {
     @Tool("""
             allows to perform any sql on the shopping database that has the following tables: Tables: 
             products (id, name, price, price_display, picture, description),
-            clients (id, name, favorite_color, pricing_setting, favorite_style, budget_profile, address),
+            users (userId, name, address),
             orders (id, client_id, product_id, quantity)
             """)
     public String performSqlOnDatabase(String sqlQuery) {
         System.out.println("Calling performSqlOnDatabase() with sqlQuery: " + sqlQuery);
+        StringBuilder result = new StringBuilder();
+
         try (Connection conn = DriverManager.getConnection(ShoppingDatabase.DB_URL);
              Statement stmt = conn.createStatement()) {
             boolean success = stmt.execute(sqlQuery);
             if (success) {
-                return stmt.getResultSet().toString();
+                ResultSet rs = stmt.getResultSet();
+                if (rs != null) {
+                    ResultSetMetaData rsMetaData = rs.getMetaData();
+                    int columnCount = rsMetaData.getColumnCount();
+                    for (int i = 1; i <= columnCount; i++) {
+                        result.append(rsMetaData.getColumnName(i)).append("\t");
+                    }
+                    result.append("\n");
+                    while (rs.next()) {
+                        for (int i = 1; i <= columnCount; i++) {
+                            String value = rs.getString(i);
+                            result.append(value != null ? value : "NULL").append("\t");
+                        }
+                        result.append("\n");
+                    }
+                    if (result.length() == 0) {
+                        return "No results found for query: " + sqlQuery;
+                    }
+                    System.out.println("Database returning:\n" + result.toString());
+                    return result.toString();
+                } else {
+                    return "ResultSet is null for query: " + sqlQuery;
+                }
             } else {
-                return "Could not fetch result";
+                return "Could not fetch result for query: " + sqlQuery;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return "Error executing SQL query: " + e.getMessage();
         }
     }
 }

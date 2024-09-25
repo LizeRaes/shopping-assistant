@@ -27,15 +27,11 @@ public class ShoppingDatabase {
                     "picture TEXT NOT NULL," +
                     "description TEXT NOT NULL)");
 
-            // Create clients table
-            stmt.execute("CREATE TABLE IF NOT EXISTS clients (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            // Create users table
+            stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
+                    "userId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "name TEXT NOT NULL," +
-                    "favorite_color TEXT," +
-                    "pricing_setting TEXT," +
-                    "favorite_style TEXT," +
-                    "budget_profile TEXT," +
-                    "address TEXT)");
+                    "address TEXT NOT NULL)");
 
             // Create orders table
             stmt.execute("CREATE TABLE IF NOT EXISTS orders (" +
@@ -53,6 +49,17 @@ public class ShoppingDatabase {
                     "('Baby Bottle 2', 12.99, 'As Credit', 'bottle2.jpg', 'Anti-colic baby bottle, 5 oz')," +
                     "('Diapers', 19.99, 'Full Price', 'diapers.jpg', 'Pack of 50 disposable diapers, size 3')";
             stmt.execute(insertProductsSQL);
+
+            // Insert sample users
+            String insertUserSQL = "INSERT INTO users (name, address) VALUES " +
+                    "('Frodo Baggins', '123 Underhill, The Shire')," +
+                    "('Samwise Gamgee', '3 Bagshot Row, Hobbiton')," +
+                    "('Gandalf the Grey', 'Middle-Earth, No Fixed Address')," +
+                    "('Aragorn Son of Arathorn', 'Gondor, Minas Tirith')," +
+                    "('Legolas Greenleaf', 'Mirkwood Forest')";
+            stmt.execute(insertUserSQL);
+
+            System.out.println("Database initialized and sample data inserted.");
 
             System.out.println("Database initialized and sample data inserted.");
         } catch (SQLException e) {
