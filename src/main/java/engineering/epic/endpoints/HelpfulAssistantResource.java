@@ -2,6 +2,7 @@ package engineering.epic.endpoints;
 
 import engineering.epic.aiservices.DecisionAssistant;
 import engineering.epic.aiservices.FinalSelectionDecider;
+import engineering.epic.aiservices.InputSanitizer;
 import engineering.epic.aiservices.OrderAssistant;
 import engineering.epic.state.CustomShoppingState;
 import engineering.epic.tools.OrderTools;
@@ -32,6 +33,9 @@ public class HelpfulAssistantResource {
     FinalSelectionDecider finalSelectionDecider;
 
     @Inject
+    InputSanitizer inputSanitizer;
+
+    @Inject
     MyWebSocket myWebSocket;
 
     @Inject
@@ -53,7 +57,13 @@ public class HelpfulAssistantResource {
             String message = request.getMessage();
             System.out.println("Received message: " + message);
 
-            // TODO decision / state logic via Drools
+            // INPUT SANITIZATION
+            if(inputSanitizer.isMalicious(message)>0.4) {
+                System.out.println("MALICIOUS INPUT DETECTED!!!");
+                myService.sendActionToSession("maliciousInput", session);
+                MessageResponse response = new MessageResponse("MALICIOUS INPUT DETECTED!!!");
+                return Response.ok(response).build();
+            }
 
             if (customShoppingState.getShoppingState().currentStep.startsWith("0")) {
                 customShoppingState.getShoppingState().moveToStep("1. Define desired products");

@@ -168,6 +168,8 @@
             displayLandingPage();
         } else if (message.action === 'askConfirmation') {
             askConfirmation();
+        } else if (message.action === 'maliciousInput') {
+            displayMaliciousPage();
         }
     };
 
@@ -314,7 +316,15 @@
         shoppingPanel.innerHTML = `
             <h2>Order placed successfully!</h2>
             <p>A confirmation email has been sent to your email address.</p>
-            <img src="/img/greatSuccess.jpg" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+            <img src="/img/greatSuccess.jpg" alt="great success" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+        `;
+    }
+
+    function displayMaliciousPage() {
+        const shoppingPanel = document.getElementById('shoppingPanel');
+        shoppingPanel.innerHTML = `
+            <img src="/img/stayaway.png" alt="stay away" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+            <h2>Our day is bad enough already</h2>
         `;
     }
 
