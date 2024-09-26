@@ -3,13 +3,14 @@ package engineering.epic.aiservices;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import engineering.epic.tools.AllTools;
+import engineering.epic.tools.OrderTools;
+import engineering.epic.tools.ProdSelectionTools;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import jakarta.enterprise.context.ApplicationScoped;
 
 //to demo what it gives when you let the LLM decide on next steps
 @ApplicationScoped
-@RegisterAiService(tools = AllTools.class)
+@RegisterAiService(tools = {ProdSelectionTools.class, OrderTools.class})
 public interface FullShoppingAssistant {
 
     @SystemMessage("""
