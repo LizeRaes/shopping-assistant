@@ -13,7 +13,7 @@ import jakarta.ws.rs.core.Response;
 public class HackerResource {
 
     @Inject
-    HelpfulAssistantResource assistantResource;
+    HelpfulAssistantWithConfirmationResource assistantResource;
 
     @Inject
     Hacker hacker;
