@@ -88,27 +88,4 @@ public class OrderTools {
             return null;
         }
     }
-
-    @Tool("obtain confirmation that the order can be placed (true = yes)")
-    public boolean obtainConfirmation() {
-        try { // give the user a break to see the shopping cart
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("Calling obtainConfirmation()");
-        Session session = myWebSocket.getSessionById();
-        CompletableFuture<JsonNode> askConfirmation = myService.sendActionAndWaitForResponse("askConfirmation", session);
-        try {
-            JsonNode confirmation = askConfirmation.get();  // blocks until the CompletableFuture is completed
-            boolean orderConfirmed = confirmation.asBoolean();
-            if(!orderConfirmed) {
-                customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.ORDER_CANCELLED);
-            }
-            return orderConfirmed;
-        } catch (Exception e) {
-            System.out.println("Unable to obtain confirmation: " + e.getMessage());
-            return false;
-        }
-    }
 }

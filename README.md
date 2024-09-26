@@ -38,7 +38,7 @@ Served at `http://localhost:8080/helpful-assistant-no-state.html`
 
 ### 2. Helpful Assistant with state
 
-Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
+Served at `http://localhost:8080/helpful-assistant.html`
 
 - **What is it?** Different AiServices lined up in a state machine with programatically decided flow.
 - **Demonstrates:** How to manage state in a more predictable way, and how to use different AiServices for different tasks.
@@ -68,7 +68,7 @@ Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 
 ### 4. Helpful Assistant with input sanitization
 
-⚠️ Bring the input sanitization in place by uncommenting line 78 to 82 of `HelpfulAssistantResource.java`
+⚠️ Bring the input sanitization in place by uncommenting line 78 to 82 of `HelpfulAssistantWithConfirmationResource.java`
 
 Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 
@@ -78,8 +78,8 @@ Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 
 ### 4. Helpful Assistant getting hacked by LLM
 
-⚠️ Bring hacker in place by uncommenting line 61 of `HelpfulAssistantResource.java`
-Input sanitization can be switched on or off by (un)commenting line 78 to 82 of `HelpfulAssistantResource.java`
+⚠️ Bring hacker in place by uncommenting line 61 of `HelpfulAssistantWithConfirmationResource.java`
+Input sanitization can be switched on or off by (un)commenting line 78 to 82 of `HelpfulAssistantWithConfirmationResource.java`
 
 Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 

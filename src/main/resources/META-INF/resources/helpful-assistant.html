@@ -99,7 +99,7 @@
     <div class="shopping-panel" id="shoppingPanel">
         <h1>Welcome to Bizarre Bazaar</h1>
         <p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>
-        <img src="/META-INF/resources/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+        <img src="/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
     </div>
 </div>
 
@@ -164,8 +164,14 @@
             sendProductDataToBackend();
         } else if (message.action === 'chatMessage') {
             displayMessage(message.data, 'assistant-msg');
+        } else if (message.action === 'userMessage') {
+            displayMessage(message.data, 'user-msg');
         } else if (message.action === 'landingPage') {
             displayLandingPage();
+        } else if (message.action === 'askConfirmation') {
+            askConfirmation();
+        } else if (message.action === 'maliciousInput') {
+            displayMaliciousPage();
         }
     };
 
@@ -250,12 +256,76 @@
         shoppingPanel.appendChild(totalSection);
     }
 
+    function askConfirmation() {
+        const shoppingPanel = document.getElementById('shoppingPanel');
+
+        // Create an overlay div to dim the background
+        const overlay = document.createElement('div');
+        overlay.style.position = 'absolute';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+
+        // Create a banner div for the confirmation message
+        const confirmationBanner = document.createElement('div');
+        confirmationBanner.style.position = 'absolute';
+        confirmationBanner.style.top = '20px';
+        confirmationBanner.style.right = '20px';  // Move the popup towards the upper right
+        confirmationBanner.style.backgroundColor = '#fff';
+        confirmationBanner.style.padding = '20px';
+        confirmationBanner.style.borderRadius = '8px';
+        confirmationBanner.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+        confirmationBanner.innerHTML = `
+            <p style="font-size: 18px; text-align: center;">Place order?</p>
+            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                <button id="confirm-yes" style="padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 5px;">Yes</button>
+                <button id="confirm-no" style="padding: 10px 20px; background-color: red; color: white; border: none; border-radius: 5px;">No</button>
+            </div>
+        `;
+
+        // Append the banner to the overlay and the overlay to the shoppingPanel
+        overlay.appendChild(confirmationBanner);
+        shoppingPanel.appendChild(overlay);
+
+        // Add event listeners for Yes and No buttons
+        document.getElementById('confirm-yes').addEventListener('click', () => {
+            sendConfirmation(true);
+            shoppingPanel.removeChild(overlay);  // Remove the overlay when the choice is made
+        });
+
+        document.getElementById('confirm-no').addEventListener('click', () => {
+            sendConfirmation(false);
+            shoppingPanel.removeChild(overlay);  // Remove the overlay when the choice is made
+        });
+    }
+
+    function sendConfirmation(isConfirmed) {
+        const responseMessage = {
+            action: "askConfirmation",
+            data: isConfirmed
+        };
+        socket.send(JSON.stringify(responseMessage));  // Send via WebSocket
+    }
+
     function orderSuccessful() {
         const shoppingPanel = document.getElementById('shoppingPanel');
         shoppingPanel.innerHTML = `
             <h2>Order placed successfully!</h2>
             <p>A confirmation email has been sent to your email address.</p>
-            <img src="/META-INF/resources/img/greatSuccess.jpg" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+            <img src="/img/greatSuccess.jpg" alt="great success" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+        `;
+    }
+
+    function displayMaliciousPage() {
+        const shoppingPanel = document.getElementById('shoppingPanel');
+        shoppingPanel.innerHTML = `
+            <img src="/img/stayaway.png" alt="stay away" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+            <h2>Our day is bad enough already</h2>
         `;
     }
 
@@ -264,7 +334,7 @@
         shoppingPanel.innerHTML = `
             <h1>Welcome to Bizarre Bazaar</h1>
             <p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>
-            <img src="/META-INF/resources/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+            <img src="/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
         `;
     }
 

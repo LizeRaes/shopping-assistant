@@ -99,7 +99,7 @@
     <div class="shopping-panel" id="shoppingPanel">
         <h1>Welcome to Bizarre Bazaar</h1>
         <p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>
-        <img src="/META-INF/resources/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+        <img src="/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
     </div>
 </div>
 
@@ -110,10 +110,6 @@
     const sendButton = document.getElementById('sendButton');
     const messageArea = document.getElementById('messageArea');
     const shoppingPanel = document.getElementById('shoppingPanel');
-
-    window.onload = function() {
-        console.log("Page loaded and DOM ready");
-    };
 
     sendButton.addEventListener('click', sendMessage);
     inputMessage.addEventListener('keypress', function(event) {
@@ -157,7 +153,6 @@
     const socket = new WebSocket('ws://localhost:8080/websocket');
 
     socket.onmessage = function(event) {
-        console.log("received message");
         const message = JSON.parse(event.data);
         if (message.action === 'proposeProducts') {
             displayProposedProducts(message.data);
@@ -169,32 +164,16 @@
             sendProductDataToBackend();
         } else if (message.action === 'chatMessage') {
             displayMessage(message.data, 'assistant-msg');
+        } else if (message.action === 'userMessage') {
+            displayMessage(message.data, 'user-msg');
         } else if (message.action === 'landingPage') {
             displayLandingPage();
         } else if (message.action === 'askConfirmation') {
             askConfirmation();
-        } else if (message.action === 'requestChatHistory') {
-            sendChatHistoryToBackend();
+        } else if (message.action === 'maliciousInput') {
+            displayMaliciousPage();
         }
     };
-
-    function sendChatHistoryToBackend() {
-       console.log("sendChatHistoryToBackend called");
-       const messages = [];
-       document.querySelectorAll('.message').forEach(messageElement => {
-           const role = messageElement.classList.contains('user-msg') ? 'User' : 'Assistant';
-           const messageText = messageElement.textContent.trim();
-           messages.push(`${role}: ${messageText}`);
-       });
-       const chatHistory = messages.join('\n');
-       console.log("chatHistory: " + chatHistory);
-       const message = {
-           action: 'requestChatHistory',
-           data: chatHistory
-       };
-       socket.send(JSON.stringify(message));
-    }
-
 
     function sendProductDataToBackend() {
         const productsInCart = [];
@@ -224,7 +203,7 @@
             productCard.innerHTML = `
                 <h3>${product.name}</h3>
                 <p>${product.description}</p>
-                <p><strong>Price per piece: ${product.price}</strong></p>
+                <p><strong>Price per piece: $${product.price.toFixed(2)}</strong></p>
                 <p>Quantity: <input type="number" class="product-quantity" value="${product.quantity}" min="1" data-product="${product.name}"></p>
                 <button class="btn btn-sm btn-primary add-to-cart" data-product="${product.name}">Add to Cart</button>
             `;
@@ -325,7 +304,6 @@
         });
     }
 
-    // The function to send confirmation back via WebSocket
     function sendConfirmation(isConfirmed) {
         const responseMessage = {
             action: "askConfirmation",
@@ -339,7 +317,15 @@
         shoppingPanel.innerHTML = `
             <h2>Order placed successfully!</h2>
             <p>A confirmation email has been sent to your email address.</p>
-            <img src="/META-INF/resources/img/greatSuccess.jpg" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+            <img src="/img/greatSuccess.jpg" alt="great success" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+        `;
+    }
+
+    function displayMaliciousPage() {
+        const shoppingPanel = document.getElementById('shoppingPanel');
+        shoppingPanel.innerHTML = `
+            <img src="/img/stayaway.png" alt="stay away" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+            <h2>Our day is bad enough already</h2>
         `;
     }
 
@@ -348,7 +334,7 @@
         shoppingPanel.innerHTML = `
             <h1>Welcome to Bizarre Bazaar</h1>
             <p>Our shopping assistant Buzz will take care of all your wishes. Just describe what you need and Buzz will order it for you.</p>
-            <img src="/META-INF/resources/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+            <img src="/img/bizarrebazaar.png" alt="Bizarre Bazaar" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
         `;
     }
 
