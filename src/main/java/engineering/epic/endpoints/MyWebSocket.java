@@ -1,6 +1,7 @@
 package engineering.epic.endpoints;
 
 import engineering.epic.state.CustomShoppingState;
+import engineering.epic.state.ShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.websocket.OnMessage;
@@ -29,7 +30,7 @@ public class MyWebSocket {
         // reset all on reload
         sessions.put("0", session);
         refreshUser();
-        customShoppingState.getShoppingState().moveToStep("0. New session");
+        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.NEW_SESSION);
         myService.sendChatMessageToFrontend("Hi, welcome to Bizarre Bazaar, what would you need?", session);
     }
 

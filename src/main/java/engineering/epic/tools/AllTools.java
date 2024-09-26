@@ -7,6 +7,7 @@ import engineering.epic.endpoints.MyService;
 import engineering.epic.endpoints.MyWebSocket;
 import engineering.epic.models.Product;
 import engineering.epic.state.CustomShoppingState;
+import engineering.epic.state.ShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.websocket.Session;
@@ -61,7 +62,7 @@ public class AllTools {
     public void proposeAProductSelection(String productNames) {
         System.out.println("Calling proposeProductSelection() with productNames: " + productNames);
         // TODO one day, handle string literals :p
-        customShoppingState.getShoppingState().moveToStep("2. Proposed products");
+        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.PROPOSE_PRODUCTS);
 
         List<String> productList = Arrays.asList(productNames.split(","));
         List<Map<String, Object>> productDetails = productList.stream()

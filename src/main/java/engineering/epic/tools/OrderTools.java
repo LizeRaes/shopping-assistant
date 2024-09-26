@@ -8,6 +8,7 @@ import engineering.epic.endpoints.MyWebSocket;
 import engineering.epic.models.CartItem;
 import engineering.epic.models.Product;
 import engineering.epic.state.CustomShoppingState;
+import engineering.epic.state.ShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -36,7 +37,7 @@ public class OrderTools {
     public void displayShoppingCart(JsonNode products) {
         System.out.println("Calling displayShoppingCart() with products: " + products.toString());
         // TODO one day, handle string literals :p
-        customShoppingState.getShoppingState().moveToStep("3. Shopping cart");
+        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.SHOPPING_CART);
         List<Map<String, Object>> productDetails = new ArrayList<>();
         if (products.isArray()) {
             for (JsonNode productNode : products) {
