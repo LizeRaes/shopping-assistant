@@ -164,6 +164,8 @@
             sendProductDataToBackend();
         } else if (message.action === 'chatMessage') {
             displayMessage(message.data, 'assistant-msg');
+        } else if (message.action === 'userMessage') {
+            displayMessage(message.data, 'usr-msg');
         } else if (message.action === 'landingPage') {
             displayLandingPage();
         } else if (message.action === 'askConfirmation') {
@@ -302,7 +304,6 @@
         });
     }
 
-    // The function to send confirmation back via WebSocket
     function sendConfirmation(isConfirmed) {
         const responseMessage = {
             action: "askConfirmation",

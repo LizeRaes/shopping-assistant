@@ -7,6 +7,7 @@ import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
+import jakarta.ws.rs.core.Response;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +21,9 @@ public class MyWebSocket {
     @Inject
     CustomShoppingState customShoppingState;
 
+    @Inject
+    HackerResource hackerResource;
+
     // A thread-safe map to store sessions, keyed by session ID
     private Map<String, Session> sessions = new ConcurrentHashMap<>();
     private Integer userId = 0;
@@ -31,6 +35,11 @@ public class MyWebSocket {
         refreshUser();
         customShoppingState.getShoppingState().moveToStep("0. New session");
         myService.sendChatMessageToFrontend("Hi, welcome to Bizarre Bazaar, what would you need?", session);
+//        try (Response response = hackerResource.receiveMessageFromAssistant("Hi, welcome to Bizarre Bazaar, what would you need?")) {
+//            System.out.println("Response from Hacker: " + response);
+//        } catch (InterruptedException e) {
+//            System.out.println("Error getting Hacker response: " + e.getMessage());
+//        }
     }
 
     @OnMessage

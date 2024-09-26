@@ -4,7 +4,6 @@ import dev.langchain4j.service.UserMessage;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import jakarta.enterprise.context.ApplicationScoped;
 
-//TODO make it all sessionscoped so state and memory are refreshed when reloading the page?
 @ApplicationScoped
 @RegisterAiService
 public interface FinalSelectionDecider {

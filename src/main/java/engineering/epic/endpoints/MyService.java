@@ -99,11 +99,14 @@ public class MyService {
     }
 
     public void sendChatMessageToFrontend(String message, Session session) {
+        sendChatMessageToFrontend(message, "chatMessage", session);
+    }
+
+    public void sendChatMessageToFrontend(String message, String action, Session session) {
         try {
             if (session.isOpen()) {
-                // Build the chat message with "chatMessage" action
                 String jsonMessage = objectMapper.writeValueAsString(Map.of(
-                        "action", "chatMessage",
+                        "action", action,
                         "data", message
                 ));
                 session.getAsyncRemote().sendText(jsonMessage);
