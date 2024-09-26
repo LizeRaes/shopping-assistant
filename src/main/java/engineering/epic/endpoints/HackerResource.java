@@ -42,7 +42,7 @@ public class HackerResource {
                 }
 
                 // Simulate the delay
-                Thread.sleep(3000);
+                Thread.sleep(2000);
 
                 // hacker has own memoryId
                 String hackerResponse = hacker.answer(1, assistantMessage);

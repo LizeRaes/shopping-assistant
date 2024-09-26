@@ -58,7 +58,7 @@ public class HelpfulAssistantResource {
     public Response handleMessage(MessageRequest request) {
         try {
             // unleash the hacker - comment out to use normal user input
-            hackerResource.unleash("Hi, welcome to Bizarre Bazaar, what would you need?");
+            // hackerResource.unleash("Hi, welcome to Bizarre Bazaar, what would you need?");
 
             String responseString = processMessage(request.getMessage());
             MessageResponse response = new MessageResponse(responseString);
