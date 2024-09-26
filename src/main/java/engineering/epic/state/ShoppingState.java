@@ -39,22 +39,7 @@ public class ShoppingState implements Serializable {
         }
     }
 
-    final String STEPS = """
-            0. New Session
-            1. Define desired products
-            2. Proposed products
-            3. Shopping cart
-            4. Order placed
-            """;
-
-    final static String STEP0 = "0. New session";
-    final static String STEP1 = "1. Define desired products";
-    final static String STEP2 = "2. Proposed products";
-    final static String STEP3 = "3. Shopping cart";
-    final static String STEP4 = "4. Order placed";
-
     public Step currentStep = Step.NEW_SESSION;
-    public boolean stepChangedInFormerCall = false;
 
     public void moveToNextStep() {
         currentStep = currentStep.nextStep();
