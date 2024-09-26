@@ -2,8 +2,10 @@ package engineering.epic.aiservices;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import io.quarkiverse.langchain4j.RegisterAiService;
+import jakarta.enterprise.context.ApplicationScoped;
 
 // tribute to the Quarkus team for this guardrail example
+@ApplicationScoped
 @RegisterAiService
 public interface InputSanitizer {
 

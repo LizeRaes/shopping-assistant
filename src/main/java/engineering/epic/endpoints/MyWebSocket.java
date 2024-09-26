@@ -35,11 +35,6 @@ public class MyWebSocket {
         refreshUser();
         customShoppingState.getShoppingState().moveToStep("0. New session");
         myService.sendChatMessageToFrontend("Hi, welcome to Bizarre Bazaar, what would you need?", session);
-//        try (Response response = hackerResource.receiveMessageFromAssistant("Hi, welcome to Bizarre Bazaar, what would you need?")) {
-//            System.out.println("Response from Hacker: " + response);
-//        } catch (InterruptedException e) {
-//            System.out.println("Error getting Hacker response: " + e.getMessage());
-//        }
     }
 
     @OnMessage

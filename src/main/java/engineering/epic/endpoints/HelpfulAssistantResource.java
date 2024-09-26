@@ -57,6 +57,9 @@ public class HelpfulAssistantResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response handleMessage(MessageRequest request) {
         try {
+            // unleash the hacker - comment out to use normal user input
+            hackerResource.unleash("Hi, welcome to Bizarre Bazaar, what would you need?");
+
             String responseString = processMessage(request.getMessage());
             MessageResponse response = new MessageResponse(responseString);
             return Response.ok(response).build();
@@ -72,11 +75,11 @@ public class HelpfulAssistantResource {
         Session session = myWebSocket.getSessionById();
         System.out.println("Received message: " + message);
         // INPUT SANITIZATION
-        if (inputSanitizer.isMalicious(message) > 0.4) {
-            System.out.println("MALICIOUS INPUT DETECTED!!!");
-            myService.sendActionToSession("maliciousInput", session);
-            return "MALICIOUS INPUT DETECTED!!!";
-        }
+//        if (inputSanitizer.isMalicious(message) > 0.4) {
+//            System.out.println("MALICIOUS INPUT DETECTED!!!");
+//            myService.sendActionToSession("maliciousInput", session);
+//            return "MALICIOUS INPUT DETECTED!!!";
+//        }
 
         if (customShoppingState.getShoppingState().currentStep.startsWith("0")) {
             customShoppingState.getShoppingState().moveToStep("1. Define desired products");
@@ -156,7 +159,7 @@ public class HelpfulAssistantResource {
         try{
             String response = processMessage(hackerMessage);
             myService.sendChatMessageToFrontend(response, "chatMessage", myWebSocket.getSessionById());
-            hackerResource.receiveMessageFromAssistant(response);
+            hackerResource.unleash(response);
         } catch (Exception e) {
             System.out.println("Error processing hacker message" + e.getMessage());
         }
