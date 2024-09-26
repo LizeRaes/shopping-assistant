@@ -7,6 +7,7 @@ import engineering.epic.endpoints.MyService;
 import engineering.epic.endpoints.MyWebSocket;
 import engineering.epic.models.Product;
 import engineering.epic.state.CustomShoppingState;
+import engineering.epic.state.ShoppingState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.websocket.Session;
@@ -38,7 +39,7 @@ public class OrderTools {
     @Tool("Displays the shopping cart to the user. Takes a comma-separated string with product names and quantities in the format 'name1:quantity1,name2:quantity2'. Example: 'Apple:2,Banana:3'")
     public void displayShoppingCart(String productsString) {
         System.out.println("Calling displayShoppingCart() with products: " + productsString);
-        customShoppingState.getShoppingState().moveToStep("3. Shopping cart");
+        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.SHOPPING_CART);
         List<Map<String, Object>> productDetails = new ArrayList<>();
         String[] productsArray = productsString.split(",");
 
@@ -70,7 +71,7 @@ public class OrderTools {
     @Tool("displays to the user that order was placed successfully")
     public void displayOrderSuccessful() {
         System.out.println("Calling displayOrderSuccess()");
-        customShoppingState.getShoppingState().moveToStep("5. Order placed");
+        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.ORDER_PLACED);
         Session session = myWebSocket.getSessionById();
         myService.sendActionToSession("orderSuccessful", session);
     }
@@ -102,7 +103,7 @@ public class OrderTools {
             JsonNode confirmation = askConfirmation.get();  // blocks until the CompletableFuture is completed
             boolean orderConfirmed = confirmation.asBoolean();
             if(!orderConfirmed) {
-                customShoppingState.getShoppingState().moveToStep("4. Order cancelled");
+                customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.ORDER_CANCELLED);
             }
             return orderConfirmed;
         } catch (Exception e) {

@@ -5,6 +5,7 @@ import engineering.epic.aiservices.FinalSelectionDecider;
 import engineering.epic.aiservices.InputSanitizer;
 import engineering.epic.aiservices.OrderAssistant;
 import engineering.epic.state.CustomShoppingState;
+import engineering.epic.state.ShoppingState;
 import engineering.epic.tools.OrderTools;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -81,25 +82,25 @@ public class HelpfulAssistantResource {
 //            return "MALICIOUS INPUT DETECTED!!!";
 //        }
 
-        if (customShoppingState.getShoppingState().currentStep.startsWith("0")) {
-            customShoppingState.getShoppingState().moveToStep("1. Define desired products");
+        if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.NEW_SESSION) {
+            customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
         }
 
-        if (customShoppingState.getShoppingState().currentStep.startsWith("2")) {
+        if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.PROPOSED_PRODUCTS) {
             if (finalSelectionDecider.stillSthToAdd(message, CONTINUE_QUESTION_1)) {
                 // customer needs to add/remove something from product proposal
                 System.out.println("FinalSelectionDecider: more to add/remove");
-                customShoppingState.getShoppingState().moveToStep("1. Define desired products");
+                customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
             } else {
                 System.out.println("FinalSelectionDecider: was final");
             }
         }
 
-        if (customShoppingState.getShoppingState().currentStep.startsWith("4") || customShoppingState.getShoppingState().currentStep.startsWith("5")) {
+        if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.ORDER_CANCELLED || customShoppingState.getShoppingState().currentStep == ShoppingState.Step.ORDER_PLACED) {
             if (finalSelectionDecider.stillSthToAdd(message, CONTINUE_QUESTION_4)) {
                 // customer wants to shop again
                 System.out.println("FinalSelectionDecider: more to add/remove");
-                customShoppingState.getShoppingState().moveToStep("1. Define desired products");
+                customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
                 myService.sendActionToSession("landingPage", session);
                 myWebSocket.refreshUser();
                 System.out.println("AI response: " + "What would you need?");
@@ -116,10 +117,10 @@ public class HelpfulAssistantResource {
         }
 
         // we're still deciding on the products to buy
-        if (customShoppingState.getShoppingState().currentStep.startsWith("1")) {
+        if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.DEFINE_PRODUCTS) {
             String answer = decisionAssistant.answer(myWebSocket.getUserId(), message);
             // if no products proposed yet, continue conversation
-            if (customShoppingState.getShoppingState().currentStep.startsWith("1")) {
+            if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.DEFINE_PRODUCTS) {
                 System.out.println("AI response: " + answer);
                 return answer;
             }
@@ -129,16 +130,16 @@ public class HelpfulAssistantResource {
         }
 
         // we have a proposed list and user doesn't want to add/remove sth
-        if (customShoppingState.getShoppingState().currentStep.startsWith("2")) {
+        if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.PROPOSED_PRODUCTS) {
             System.out.println("--- STEP 2 ---");
             String answer = orderAssistant.answer(myWebSocket.getUserId(), message);
             // Calling displayShoppingCart() will move state to step 3 (not entirely done yet)
-            if (customShoppingState.getShoppingState().currentStep.startsWith("2") || customShoppingState.getShoppingState().currentStep.startsWith("3")) {
+            if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.PROPOSED_PRODUCTS || customShoppingState.getShoppingState().currentStep == ShoppingState.Step.SHOPPING_CART) {
                 System.out.println("AI response: " + answer);
                 return answer;
             }
             // Unsuccessful order will move to state 4
-            if (customShoppingState.getShoppingState().currentStep.startsWith("4")) {
+            if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.ORDER_CANCELLED) {
                 myService.sendActionToSession("landingPage", session);
                 System.out.println("No problem, your order is cancelled");
                 myService.sendChatMessageToFrontend("No problem, your order is cancelled", session);
