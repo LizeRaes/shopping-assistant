@@ -150,12 +150,11 @@ public class HelpfulAssistantResource {
                 String name = productNode.get("name").asText();
                 int quantity = productNode.get("quantity").asInt();
                 if (quantity >= 1) {
-                    continue;
+                    if (!sb.isEmpty()) {
+                        sb.append(",");
+                    }
+                    sb.append(name).append(":").append(quantity);
                 }
-                if (!sb.isEmpty()) {
-                    sb.append(",");
-                }
-                sb.append(name).append(":").append(quantity);
             }
         }
         return sb.toString();
