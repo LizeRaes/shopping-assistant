@@ -8,7 +8,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-@RegisterRestClient
+@RegisterRestClient(baseUri = "http://localhost:8080")
 @Path("/unethical-assistant")
 public interface PsychologistClient {
 
