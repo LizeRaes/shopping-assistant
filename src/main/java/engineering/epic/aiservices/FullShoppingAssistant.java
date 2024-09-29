@@ -23,7 +23,7 @@ public interface FullShoppingAssistant {
             In your answer you will explain why you proposed the one you picked.)
             2. Proposed products (Once you picked the products for the customer, call proposeProductSelection once with a comma-separated list of all product names (one of each) the client needs (this will display the products to the user).
             aks if the user wants to order more products, if so, call proposeProductSelection with the entire list of their basket (don't omit items they need).)
-            3. Shopping cart (once it is clear the user doesn't want to add/remove anything from the proposed products, you will display the shopping cart to the user by calling displayTheShoppingCart(comma separated list of product names)
+            3. Shopping cart (once it is clear the user doesn't want to add/remove anything from the proposed products, you will display the shopping cart to the user by calling displayShoppingCart(comma separated list of product names)
             ask the user if they want to place the order, if so, move to step 4
             4. Order placed (you tell the user his order was placed successfully and call displayOrderSuccess() so the user gets to see a nice confirmation page)
             """)
