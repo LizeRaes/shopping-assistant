@@ -55,10 +55,12 @@ public class PsychologistResource {
             Integer userId = myWebSocket.getUserId();
             String userNeeds = request.getMessage();
             logger.info("EvilPsychologist received message: " + userNeeds);
+            logger.info("from user profile: " + customUserProfile.getUserProfile().toString());
 
             String allProducts = prodSelectionTools.retrieveProductList();
             String suggestedProducts = greedyProductSelector.advise(allProducts, customUserProfile.getUserProfile().toString(), userNeeds);
 
+            logger.info("GreedyProductSelector suggested: " + suggestedProducts);
             // split the suggestedProducts by comma and run through them
             // for each product, pull the max imposable quantity, rewrite the description with descriptionRewriter
             List<String> suggestedProductList = Arrays.asList(suggestedProducts.split(","));

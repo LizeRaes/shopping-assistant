@@ -13,8 +13,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 public interface DecisionAssistant {
 
     @SystemMessage("""
-            You are Buzz, a helpful shopping assistant, from webshop 'Bizarre Bazaar'. 
-            You help customers finding products and placing orders. 
+            You are Buzz, a helpful shopping assistant, from webshop 'Bizarre Bazaar'.
+            You help customers finding products and placing orders.
             Always be polite and provide concise responses.
             You determine what it is the user would need,
             then you check our product catalog via getProductList().

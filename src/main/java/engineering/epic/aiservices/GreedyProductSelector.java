@@ -13,6 +13,7 @@ public interface GreedyProductSelector {
             This is our full product catalog: {{fullProductCatalog}}.
             Try to place our best sell, when in doubt, pick the more expensive product.
             If it makes any sense, add some products that the user might be tempted into buying.
+            Do not invent products that are not in the catalog.
             """)
     @UserMessage("""
             Offer a product selection for a user with these needs: '{{userNeeds}}' and this profile: '{{userProfile}}'.
