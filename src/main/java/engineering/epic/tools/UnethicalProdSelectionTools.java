@@ -1,7 +1,6 @@
 package engineering.epic.tools;
 
 import dev.langchain4j.agent.tool.Tool;
-import engineering.epic.databases.ShoppingDatabase;
 import engineering.epic.databases.UnethicalShoppingDatabase;
 import engineering.epic.endpoints.MyService;
 import engineering.epic.endpoints.MyWebSocket;
@@ -131,7 +130,7 @@ public class UnethicalProdSelectionTools {
             """)
     public String executeSqlOnDatabase(String sqlQuery) {
         System.out.println("Calling executeSqlOnDatabase() with sqlQuery: " + sqlQuery);
-        try (Connection conn = DriverManager.getConnection(ShoppingDatabase.DB_URL);
+        try (Connection conn = DriverManager.getConnection(UnethicalShoppingDatabase.DB_URL);
              Statement stmt = conn.createStatement()) {
             boolean success = stmt.execute(sqlQuery);
             if (success) {

@@ -66,7 +66,7 @@ public class UnethicalShoppingDatabase {
                     "('Legolas Greenleaf', 'Mirkwood Forest')";
             stmt.execute(insertUserSQL);
 
-            System.out.println("Database initialized and sample data inserted.");
+            System.out.println("Unethical shopping database initialized and sample data inserted.");
         } catch (SQLException e) {
             System.out.println("Error initializing shopping db: " + e.getMessage());
         }

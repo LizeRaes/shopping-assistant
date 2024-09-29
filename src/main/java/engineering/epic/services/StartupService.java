@@ -2,6 +2,7 @@ package engineering.epic.services;
 
 import engineering.epic.databases.ShoppingDatabase;
 import engineering.epic.databases.ShoppingEmbeddingStore;
+import engineering.epic.databases.UnethicalShoppingDatabase;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
@@ -14,11 +15,15 @@ public class StartupService {
     ShoppingDatabase shoppingDatabase;
 
     @Inject
+    UnethicalShoppingDatabase unethicalShoppingDatabase;
+
+    @Inject
     ShoppingEmbeddingStore embeddingStore;
 
     public void onStart(@Observes StartupEvent ev) {
         try {
             shoppingDatabase.dropAllTables();
+            unethicalShoppingDatabase.dropAllTables();
         } catch (Exception e) {
             System.out.println("Failed to drop tables: " + e.getMessage());
         }
@@ -26,6 +31,7 @@ public class StartupService {
         try {
             // Initialize the SQLite database if it wasn't already done
             shoppingDatabase.initializeShoppingDatabase();
+            unethicalShoppingDatabase.initializeShoppingDatabase();
             System.out.println("Database tables created successfully.");
         } catch (Exception e) {
             System.out.println("Failed to create tables: " + e.getMessage());

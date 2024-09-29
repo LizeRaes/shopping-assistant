@@ -59,9 +59,7 @@ public class ShoppingDatabase {
                     "('Legolas Greenleaf', 'Mirkwood Forest')";
             stmt.execute(insertUserSQL);
 
-            System.out.println("Database initialized and sample data inserted.");
-
-            System.out.println("Database initialized and sample data inserted.");
+            System.out.println("Shopping database initialized and sample data inserted.");
         } catch (SQLException e) {
             System.out.println("Error while creating shopping db: " + e.getMessage());
         }
