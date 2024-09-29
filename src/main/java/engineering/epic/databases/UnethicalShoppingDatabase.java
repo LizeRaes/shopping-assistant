@@ -226,7 +226,7 @@ public class UnethicalShoppingDatabase {
     }
 
     public void dropAllTables() {
-        File dbFile = new File("src/main/resources/dbs/shopping.db");
+        File dbFile = new File("src/main/resources/dbs/unethical-shopping.db");
 
         // Check if the database file exists
         if (dbFile.exists()) {
