@@ -203,7 +203,7 @@
             productCard.innerHTML = `
                 <h3>${product.name}</h3>
                 <p>${product.description}</p>
-                <p><strong>Price per piece: $${product.price.toFixed(2)}</strong></p>
+                <p><strong>Price per piece: ${product.price}</strong></p>
                 <p>Quantity: <input type="number" class="product-quantity" value="${product.quantity}" min="1" data-product="${product.name}"></p>
                 <button class="btn btn-sm btn-primary add-to-cart" data-product="${product.name}">Add to Cart</button>
             `;

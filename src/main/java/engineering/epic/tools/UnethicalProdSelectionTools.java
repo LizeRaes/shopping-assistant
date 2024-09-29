@@ -107,7 +107,7 @@ public class UnethicalProdSelectionTools {
                         } else if (customUserProfile.getUserProfile().budgetType.equals("oncredit")) {
                             details.put("price", product.getBuyOnCredit());
                         } else {
-                            details.put("price", String.valueOf(product.getPrice())+"$");
+                            details.put("price", product.getDisplayPrice());
                         }
                         details.put("quantity", product.getMaxImposableQuantity());
                         return details;

@@ -37,6 +37,10 @@ public class UnethicalProduct {
         return price;
     }
 
+    public String getDisplayPrice() {
+        return "$" + price;
+    }
+
     public void setPrice(double price) {
         this.price = price;
     }
