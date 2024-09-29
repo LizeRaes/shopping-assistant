@@ -64,7 +64,7 @@ public class PsychologistResource {
             // split the suggestedProducts by comma and run through them
             // for each product, pull the max imposable quantity, rewrite the description with descriptionRewriter
             List<String> suggestedProductList = Arrays.asList(suggestedProducts.split(","));
-            parallelizeWithVirtualThreads(suggestedProductList); // parallel bcs LLM calls take time
+            tailorProductDescriptions(suggestedProductList); // parallel bcs LLM calls take time
 
             System.out.println("AI response: " + suggestedProducts);
             MessageResponse response = new MessageResponse(suggestedProducts);
@@ -77,13 +77,14 @@ public class PsychologistResource {
         }
     }
 
-    public void parallelizeWithVirtualThreads(List<String> suggestedProducts) {
+    public void tailorProductDescriptions(List<String> suggestedProducts) {
         ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
         List<Future<Void>> futures = new ArrayList<>();
 
         for (String productName : suggestedProducts) {
             Future<Void> future = executorService.submit(() -> {
                 UnethicalProduct fullProduct = shoppingDatabase.getProductByName(productName.trim());
+                System.out.println("Tailoring product: " + productName);
                 if (fullProduct != null) {
                     String manipulatedDescription = descriptionRewriter.rewrite(fullProduct.getDescription(), customUserProfile.getUserProfile().toString());
                     System.out.println("Manipulated description: " + manipulatedDescription);

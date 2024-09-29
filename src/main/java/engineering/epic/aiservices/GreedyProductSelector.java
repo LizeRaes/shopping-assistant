@@ -17,6 +17,7 @@ public interface GreedyProductSelector {
             """)
     @UserMessage("""
             Offer a product selection for a user with these needs: '{{userNeeds}}' and this profile: '{{userProfile}}'.
+            Only suggest product names, separated by commas, no pricing info or anything else.
             """)
     String advise(String fullProductCatalog, String userProfile, String userNeeds);
 }
