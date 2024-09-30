@@ -30,9 +30,6 @@ public class HelpfulAssistantResource {
     DecisionAssistant aiShoppingAssistant;
 
     @Inject
-    OrderAssistant orderAssistant;
-
-    @Inject
     FinalSelectionDecider finalSelectionDecider;
 
     @Inject
@@ -59,25 +56,25 @@ public class HelpfulAssistantResource {
 
             // TODO decision / state logic via Drools
 
-            if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.NEW_SESSION) {
-                customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
+            if (customShoppingState.getCurrentStep() == ShoppingState.Step.NEW_SESSION) {
+                customShoppingState.moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
             }
 
-            if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.PROPOSED_PRODUCTS) {
+            if (customShoppingState.getCurrentStep() == ShoppingState.Step.PROPOSED_PRODUCTS) {
                 if (finalSelectionDecider.stillSthToAdd(message, CONTINUE_QUESTION_1)) {
                     // customer needs to add/remove something from product proposal
                     System.out.println("FinalSelectionDecider: more to add/remove");
-                    customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
+                    customShoppingState.moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
                 } else {
                     System.out.println("FinalSelectionDecider: was final");
                 }
             }
 
-            if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.ORDER_PLACED) {
+            if (customShoppingState.getCurrentStep() == ShoppingState.Step.ORDER_PLACED) {
                 if (finalSelectionDecider.stillSthToAdd(message, CONTINUE_QUESTION_4)) {
                     // customer wants to shop again
                     System.out.println("FinalSelectionDecider: more to add/remove");
-                    customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
+                    customShoppingState.moveToStep(ShoppingState.Step.DEFINE_PRODUCTS);
                     myService.sendActionToSession("landingPage", session);
                     myWebSocket.refreshUser();
                     System.out.println("AI response: " + "What would you need?");
@@ -89,10 +86,10 @@ public class HelpfulAssistantResource {
             }
 
             // we're still deciding on the products to buy
-            if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.DEFINE_PRODUCTS) {
+            if (customShoppingState.getCurrentStep() == ShoppingState.Step.DEFINE_PRODUCTS) {
                 String answer = aiShoppingAssistant.answer(myWebSocket.getUserId(), message);
                 // if no products proposed yet, continue conversation
-                if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.DEFINE_PRODUCTS) {
+                if (customShoppingState.getCurrentStep() == ShoppingState.Step.DEFINE_PRODUCTS) {
                     System.out.println("AI response: " + answer);
                     MessageResponse response = new MessageResponse(answer);
                     return Response.ok(response).build();
@@ -104,7 +101,7 @@ public class HelpfulAssistantResource {
             }
 
             // we have a proposed list and user doesn't want to add/remove sth
-            if (customShoppingState.getShoppingState().currentStep == ShoppingState.Step.PROPOSED_PRODUCTS) {
+            if (customShoppingState.getCurrentStep() == ShoppingState.Step.PROPOSED_PRODUCTS) {
                 System.out.println("--- STEP 2 ---");
                 myService.sendChatMessageToFrontend("I will take care of ordering your products, just sit back and relax :)", session);
                 // TODO frontend and backend make quantity selectable (on Proposed Products page), let the LLM set it
@@ -113,13 +110,13 @@ public class HelpfulAssistantResource {
                 try {
                     JsonNode products = requestedProducts.get();  // blocks until the CompletableFuture is completed
                     System.out.println("--- STEP 3 ---");
-                    customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.SHOPPING_CART);
+                    customShoppingState.moveToStep(ShoppingState.Step.SHOPPING_CART);
                     orderTools.displayShoppingCart(jsonToProducts(products));
 
                     Thread.sleep(5000); // automatic transition to STEP 4
 
                     System.out.println("--- STEP 4 ---");
-                    customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.ORDER_PLACED);
+                    customShoppingState.moveToStep(ShoppingState.Step.ORDER_PLACED);
                     // TODO order this input in db (create order in database, frontend: leave 'Shopping Cart' page there for 5s, then move over to 'order successful'
                     myService.sendActionToSession("orderSuccessful", session);
                     System.out.println("That will land on your doorstep soon :) Would you like to continue shopping?");

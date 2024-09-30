@@ -57,7 +57,7 @@ public class ProdSelectionTools {
     public void proposeProductSelection(String productNames) {
         System.out.println("Calling proposeProductSelection() with productNames: " + productNames);
         // TODO one day, handle string literals :p
-        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.PROPOSED_PRODUCTS);
+        customShoppingState.moveToStep(ShoppingState.Step.PROPOSED_PRODUCTS);
 
         List<String> productList = Arrays.asList(productNames.split(","));
         List<Map<String, Object>> productDetails = productList.stream()

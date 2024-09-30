@@ -21,18 +21,14 @@ public class ShoppingState implements Serializable {
             this.description = description;
         }
 
-        Step step(int id) {
-            return Step.values()[id];
-        }
-
         public String getDescription() {
             return description;
         }
     }
 
-    public Step currentStep = Step.NEW_SESSION;
+    Step currentStep = Step.NEW_SESSION;
 
-    public void moveToStep(Step step) {
+    void moveToStep(Step step) {
         currentStep = step;
     }
 }

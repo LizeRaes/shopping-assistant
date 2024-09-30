@@ -34,7 +34,7 @@ public class MyWebSocket {
         // reset all on reload
         sessions.put("0", session);
         refreshUser();
-        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.NEW_SESSION);
+        customShoppingState.moveToStep(ShoppingState.Step.NEW_SESSION);
         myService.sendChatMessageToFrontend("Hi, welcome to Bizarre Bazaar, what would you need?", session);
     }
 

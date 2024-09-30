@@ -5,6 +5,7 @@ import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import engineering.epic.tools.ProdSelectionTools;
 import io.quarkiverse.langchain4j.RegisterAiService;
+import io.quarkiverse.langchain4j.guardrails.InputGuardrails;
 import jakarta.enterprise.context.ApplicationScoped;
 
 //TODO make it all sessionscoped so state and memory are refreshed when reloading the page?
@@ -23,6 +24,7 @@ public interface DecisionAssistant {
             Once you picked the products for the customer, call proposeProductSelection once with a comma-separated list of all product names (one of each) the client needs (this will display the products to the user).
             If the user wants to add more products, always call proposeProductSelection with the entire list of their basket (don't omit items they need).
             """)
+    @InputGuardrails(MaliciousInputGuard.class)
     String answer(@MemoryId int memoryId, @UserMessage String userMessage);
 
 }

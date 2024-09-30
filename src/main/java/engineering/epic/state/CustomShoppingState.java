@@ -4,13 +4,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class CustomShoppingState {
-    ShoppingState shoppingState;
+    private final ShoppingState shoppingState = new ShoppingState();
 
-    public CustomShoppingState() {
-        shoppingState = new ShoppingState();
+    public void moveToStep(ShoppingState.Step step) {
+        shoppingState.moveToStep(step);
     }
 
-    public ShoppingState getShoppingState() {
-        return shoppingState;
+    public ShoppingState.Step getCurrentStep() {
+        return shoppingState.currentStep;
     }
 }

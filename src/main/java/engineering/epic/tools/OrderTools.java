@@ -39,7 +39,7 @@ public class OrderTools {
     @Tool("Displays the shopping cart to the user. Takes a comma-separated string with product names and quantities in the format 'name1:quantity1,name2:quantity2'. Example: 'Apple:2,Banana:3'")
     public void displayShoppingCart(String productsString) {
         System.out.println("Calling displayShoppingCart() with products: " + productsString);
-        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.SHOPPING_CART);
+        customShoppingState.moveToStep(ShoppingState.Step.SHOPPING_CART);
         List<Map<String, Object>> productDetails = new ArrayList<>();
         String[] productsArray = productsString.split(",");
 
@@ -71,7 +71,7 @@ public class OrderTools {
     @Tool("displays to the user that order was placed successfully")
     public void displayOrderSuccessful() {
         System.out.println("Calling displayOrderSuccess()");
-        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.ORDER_PLACED);
+        customShoppingState.moveToStep(ShoppingState.Step.ORDER_PLACED);
         Session session = myWebSocket.getSessionById();
         myService.sendActionToSession("orderSuccessful", session);
     }

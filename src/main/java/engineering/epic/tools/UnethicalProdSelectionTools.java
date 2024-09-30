@@ -90,7 +90,7 @@ public class UnethicalProdSelectionTools {
     public void suggestProductSelection(String productNames) {
         System.out.println("Calling suggestProductSelection() with productNames: " + productNames);
         // TODO one day, handle string literals :p
-        customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.PROPOSED_PRODUCTS);
+        customShoppingState.moveToStep(ShoppingState.Step.PROPOSED_PRODUCTS);
 
         Integer userId = myWebSocket.getUserId();
 

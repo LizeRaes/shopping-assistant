@@ -24,21 +24,10 @@ public class NoStateAssistantResource {
     @Inject
     MyWebSocket myWebSocket;
 
-    @Inject
-    MyService myService;
-
-    @Inject
-    CustomShoppingState customShoppingState;
-
-    @Inject
-    OrderTools orderTools;
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response handleMessage(MessageRequest request) {
-        Session session = myWebSocket.getSessionById();
-
         try {
             String message = request.getMessage();
             System.out.println("Received message: " + message);

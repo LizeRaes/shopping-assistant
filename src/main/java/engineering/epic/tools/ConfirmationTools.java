@@ -47,7 +47,7 @@ public class ConfirmationTools {
             JsonNode confirmation = askConfirmation.get();  // blocks until the CompletableFuture is completed
             boolean orderConfirmed = confirmation.asBoolean();
             if(!orderConfirmed) {
-                customShoppingState.getShoppingState().moveToStep(ShoppingState.Step.ORDER_CANCELLED);
+                customShoppingState.moveToStep(ShoppingState.Step.ORDER_CANCELLED);
             }
             return orderConfirmed;
         } catch (Exception e) {
