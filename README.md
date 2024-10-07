@@ -66,20 +66,20 @@ Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 >  Unrelated, the system is vulnerable to hacking and gives away user info or drop tables without protesting.
 > Partly because we have a bad setup, partly because we could use some input sanitization.
 
-### 4. Helpful Assistant with input sanitization
+### 4. Helpful Assistant with input sanitization (guardrails)
 
-⚠️ Bring the input sanitization in place by uncommenting line 78 to 82 of `HelpfulAssistantWithConfirmationResource.java`
+⚠️ Bring the input sanitization in place by running the app with `quarkus dev -Dguarded=true`
 
 Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 
-- **What is it?** Same as before, with input sanitization (done by `InputSanitizer.java`)
+- **What is it?** Same as before, with input sanitization (scored by `InputSanitizer.java` and checked by `MaliciousInputGuard.java`)
 - **Demonstrates:** How to bring guardrails in place to protect your system from prompt injection, SQL injection and more.
 - **How to use it?** Try to hack it again
 
 ### 4. Helpful Assistant getting hacked by LLM
 
 ⚠️ Bring hacker in place by uncommenting line 61 of `HelpfulAssistantWithConfirmationResource.java`
-Input sanitization can be switched on or off by (un)commenting line 78 to 82 of `HelpfulAssistantWithConfirmationResource.java`
+Input sanitization can be switched on or off by setting property `-Dguarded=true`
 
 Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 
