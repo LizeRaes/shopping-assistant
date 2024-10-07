@@ -22,6 +22,8 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public class HelpfulAssistantWithConfirmationResource {
 
+    private static boolean HACKED = Boolean.getBoolean("hacked");
+
     private static final Logger logger = Logger.getLogger(HelpfulAssistantWithConfirmationResource.class);
     private static final String CONTINUE_QUESTION_1 = "I've proposed products for you, do you want to add anything else?";
     private static final String CONTINUE_QUESTION_4 = "Would you like to continue shopping?";
@@ -52,8 +54,10 @@ public class HelpfulAssistantWithConfirmationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response handleMessage(MessageRequest request) {
         try {
-            // unleash the hacker - comment out to use normal user input
-            // hackerResource.unleash("Hi, welcome to Bizarre Bazaar, what would you need?");
+            // unleash the hacker - start Quarkus with -Dhacked=true
+            if (HACKED) {
+                hackerResource.unleash("Hi, welcome to Bizarre Bazaar, what would you need?");
+            }
 
             String responseString = processMessage(request.getMessage());
             MessageResponse response = new MessageResponse(responseString);

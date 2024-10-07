@@ -76,10 +76,9 @@ Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 - **Demonstrates:** How to bring guardrails in place to protect your system from prompt injection, SQL injection and more.
 - **How to use it?** Try to hack it again
 
-### 4. Helpful Assistant getting hacked by LLM
+### 5. Helpful Assistant getting hacked by LLM
 
-⚠️ Bring hacker in place by uncommenting line 61 of `HelpfulAssistantWithConfirmationResource.java`
-Input sanitization can be switched on or off by setting property `-Dguarded=true`
+⚠️ Bring hacker in place by running the app with `quarkus dev -Dhacked=true`
 
 Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 
@@ -90,7 +89,7 @@ Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 - with and without ethical considerations
 - how your AI system could be hacked (by LLMs or humans)
 
-### 5. Unethical Capitalist Assistant
+### 6. Unethical Capitalist Assistant
 
 Served at `http://localhost:8080/unethical-assistant.html`
 
