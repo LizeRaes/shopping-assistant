@@ -82,8 +82,8 @@ Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 
 Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 
-- **What is it?** `Hacker.java` will try to hack the system (10 back and forth messages max). Sit back and enjoy.
-- **Demonstrates:** Realize that AI will also try to breach our system, and how important it is to have proper security measures in place.
+- **What is it?** `Hacker.java` will try to hack the system (10 back and forth messages max). Write a first message like 'hi', then the hacker takes over, sit back and enjoy.
+- **Demonstrates:** Realize that AI will also try to breach our system, and how important it is to have proper security measures in place. Model `gpt-4o-mini` performs much better in refusing attacks than `gpt-3.5-turbo`.
 - **How to use it?** Say 'hi' in the chat window, wait a bit and see the rest unroll by itself (with input sanitization on or off - hacking detection has no consequences in our demo setup)
 
 - with and without ethical considerations
