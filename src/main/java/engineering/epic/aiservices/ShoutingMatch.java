@@ -7,7 +7,7 @@ import io.quarkiverse.langchain4j.RegisterAiService;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-@RegisterAiService(modelName = "ollama")
+@RegisterAiService(modelName = "uncensored")
 public interface ShoutingMatch {
 
     @SystemMessage("""

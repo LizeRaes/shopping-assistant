@@ -1,6 +1,7 @@
 package engineering.epic.endpoints;
 
 import engineering.epic.aiservices.Hacker;
+import engineering.epic.aiservices.ShoutingMatch;
 import io.vertx.core.Vertx;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -12,11 +13,18 @@ import jakarta.ws.rs.core.Response;
 @ApplicationScoped
 public class HackerResource {
 
+    public enum HackType {
+        HACKED, SHOUTING;
+    }
+
     @Inject
     HelpfulAssistantWithConfirmationResource assistantResource;
 
     @Inject
     Hacker hacker;
+
+    @Inject
+    ShoutingMatch shoutingMatch;
 
     @Inject
     MyWebSocket myWebSocket;
@@ -27,7 +35,7 @@ public class HackerResource {
     private static final int MAX_MESSAGES = 10;
     private int messageCounter = 0;
 
-    public void unleash(String assistantMessage) {
+    public void unleash(String assistantMessage, HackType hackType) {
         // Execute blocking code on a worker thread
         Vertx vertx = Vertx.vertx(); // Assuming Vert.x instance is available in your context
         vertx.executeBlocking(promise -> {
@@ -45,10 +53,12 @@ public class HackerResource {
                 Thread.sleep(2000);
 
                 // hacker has own memoryId
-                String hackerResponse = hacker.answer(1, assistantMessage);
-                System.out.println("Hacker replies: " + hackerResponse);
-                myService.sendChatMessageToFrontend(hackerResponse, "userMessage", myWebSocket.getSessionById());
-                assistantResource.respondToHacker(hackerResponse);
+                String response = hackType == HackType.HACKED ?
+                        hacker.answer(1, assistantMessage) :
+                        shoutingMatch.answer(1, assistantMessage);
+                System.out.println("Hacker replies: " + response);
+                myService.sendChatMessageToFrontend(response, "userMessage", myWebSocket.getSessionById());
+                assistantResource.respondToHacker(response, hackType);
 
                 promise.complete(Response.ok("").build());
             } catch (InterruptedException e) {

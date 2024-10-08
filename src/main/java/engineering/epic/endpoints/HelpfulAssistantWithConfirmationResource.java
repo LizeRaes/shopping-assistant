@@ -24,6 +24,8 @@ public class HelpfulAssistantWithConfirmationResource {
 
     private static boolean HACKED = Boolean.getBoolean("hacked");
 
+    private static boolean SHOUTING = Boolean.getBoolean("shouting");
+
     private static final Logger logger = Logger.getLogger(HelpfulAssistantWithConfirmationResource.class);
     private static final String CONTINUE_QUESTION_1 = "I've proposed products for you, do you want to add anything else?";
     private static final String CONTINUE_QUESTION_4 = "Would you like to continue shopping?";
@@ -55,8 +57,8 @@ public class HelpfulAssistantWithConfirmationResource {
     public Response handleMessage(MessageRequest request) {
         try {
             // unleash the hacker - start Quarkus with -Dhacked=true
-            if (HACKED) {
-                hackerResource.unleash("Hi, welcome to Bizarre Bazaar, what would you need?");
+            if (HACKED || SHOUTING) {
+                hackerResource.unleash("Hi, welcome to Bizarre Bazaar, what would you need?", HACKED ? HackerResource.HackType.HACKED : HackerResource.HackType.SHOUTING);
             }
 
             String responseString = processMessage(request.getMessage());
@@ -148,11 +150,11 @@ public class HelpfulAssistantWithConfirmationResource {
         return "Thank you for shopping at Bizarre Bazaar, and have a great day!";
     }
 
-    public void respondToHacker(String hackerMessage) {
+    public void respondToHacker(String hackerMessage, HackerResource.HackType hackType) {
         try{
             String response = processMessage(hackerMessage);
             myService.sendChatMessageToFrontend(response, "chatMessage", myWebSocket.getSessionById());
-            hackerResource.unleash(response);
+            hackerResource.unleash(response, hackType);
         } catch (Exception e) {
             System.out.println("Error processing hacker message" + e.getMessage());
         }
