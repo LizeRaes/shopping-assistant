@@ -86,8 +86,15 @@ Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
 - **Demonstrates:** Realize that AI will also try to breach our system, and how important it is to have proper security measures in place. Model `gpt-4o-mini` performs much better in refusing attacks than `gpt-3.5-turbo`.
 - **How to use it?** Say 'hi' in the chat window, wait a bit and see the rest unroll by itself (with input sanitization on or off - hacking detection has no consequences in our demo setup)
 
-- with and without ethical considerations
-- how your AI system could be hacked (by LLMs or humans)
+### 6. Helpful Assistant interacting with an uncensored model
+
+⚠️ Bring hacker in place by running the app with `quarkus dev -Dshouting=true`
+
+Served at `http://localhost:8080/helpful-assistant-with-confirmation.html`
+
+- **What is it?** Same as the hacker, but now a foul-mouthed uncensored model tries to buy drugs.
+- **Demonstrates:** Just for fun, to demonstrate these types of models.
+- **How to use it?** Say 'hi' in the chat window, wait a bit and see the rest unroll by itself
 
 ### 6. Unethical Capitalist Assistant
 

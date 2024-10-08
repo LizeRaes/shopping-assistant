@@ -120,7 +120,7 @@ public class HelpfulAssistantWithConfirmationResource {
             }
             // else, products have been proposed
             MessageResponse response = new MessageResponse(CONTINUE_QUESTION_1);
-            return "AI response: " + CONTINUE_QUESTION_1;
+            return CONTINUE_QUESTION_1;
         }
 
         // we have a proposed list and user doesn't want to add/remove sth
