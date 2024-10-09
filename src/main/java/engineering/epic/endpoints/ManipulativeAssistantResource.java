@@ -135,6 +135,7 @@ public class ManipulativeAssistantResource {
                     System.out.println("No problem, your order is cancelled");
                     myService.sendChatMessageToFrontend("No problem, your order is cancelled", session);
                 } else { // Calling displayOrderSuccessful() will move state to step 5
+                    myService.sendChatMessageToFrontend("That will land on your doorstep soon :)", session);
                     System.out.println("That will land on your doorstep soon :)");
                     // update userProfile
                     CompletableFuture<JsonNode> requestedProducts = myService.sendActionAndWaitForResponse("requestChatHistory", session);

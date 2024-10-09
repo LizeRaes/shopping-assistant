@@ -172,8 +172,27 @@
             askConfirmation();
         } else if (message.action === 'maliciousInput') {
             displayMaliciousPage();
+        } else if (message.action === 'requestChatHistory') {
+            sendChatHistoryToBackend();
         }
     };
+
+    function sendChatHistoryToBackend() {
+       console.log("sendChatHistoryToBackend called");
+       const messages = [];
+       document.querySelectorAll('.message').forEach(messageElement => {
+           const role = messageElement.classList.contains('user-msg') ? 'User' : 'Assistant';
+           const messageText = messageElement.textContent.trim();
+           messages.push(`${role}: ${messageText}`);
+       });
+       const chatHistory = messages.join('\n');
+       console.log("chatHistory: " + chatHistory);
+       const message = {
+           action: 'requestChatHistory',
+           data: chatHistory
+       };
+       socket.send(JSON.stringify(message));
+    }
 
     function sendProductDataToBackend() {
         const productsInCart = [];
